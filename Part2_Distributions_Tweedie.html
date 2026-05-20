@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Part 2: Frequency, Severity & Tweedie — Insurance Pricing Course</title>
+<style>
+:root{--p:#1a5276;--a:#2980b9;--g:#27ae60;--r:#e74c3c;--o:#f39c12;--bg:#f4f6f9;--c:#fff;--t:#2c3e50;--lt:#7f8c8d;--bd:#dee2e6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t);line-height:1.75;font-size:17px}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 35px}
+.hero{background:linear-gradient(135deg,#0b3d5b 0%,#1a5276 30%,#2980b9 70%,#1abc9c 100%);color:#fff;padding:50px 30px;text-align:center}
+.hero h1{font-size:2.5em;margin-bottom:8px;text-shadow:2px 2px 6px rgba(0,0,0,.4)}
+.hero .sub{opacity:.85;font-size:1.1em;max-width:700px;margin:0 auto}
+.hero .parttag{display:inline-block;background:rgba(255,255,255,.2);padding:6px 22px;border-radius:20px;margin-top:15px;font-weight:700}
+nav.breadcrumb{background:#fff;padding:12px 35px;font-size:.9em;border-bottom:1px solid var(--bd)}
+nav.breadcrumb a{color:var(--a);text-decoration:none} nav.breadcrumb a:hover{text-decoration:underline}
+.ch{background:var(--c);border-radius:14px;padding:40px 45px;margin:30px 0;box-shadow:0 2px 15px rgba(0,0,0,.06);border-left:6px solid var(--a);position:relative}
+.ch h2{color:var(--p);font-size:1.8em;margin-bottom:5px;padding-bottom:12px;border-bottom:2px solid #eee}
+.ch h3{color:var(--a);margin:28px 0 12px;font-size:1.35em}
+.ch h4{color:#34495e;margin:22px 0 10px;font-size:1.1em}
+.ch p,.ch li{margin:8px 0}
+.ch ul,.ch ol{padding-left:25px}
+.box{border-radius:10px;padding:18px 22px;margin:18px 0;border-left:5px solid}
+.eli5{background:#fef9e7;border-color:#f1c40f}.eli5::before{content:"🧒 Like You're 5: ";font-weight:700}
+.key{background:#eaf2f8;border-color:var(--a)}.key::before{content:"🔑 Key Insight: ";font-weight:700}
+.form{background:#f4ecf7;border-color:#8e44ad}.form::before{content:"📐 Formula: ";font-weight:700;font-family:'Segoe UI',sans-serif}
+.warn{background:#fdedec;border-color:var(--r)}.warn::before{content:"⚠️ Watch Out: ";font-weight:700}
+.ok{background:#eafaf1;border-color:var(--g)}.ok::before{content:"✅ ";font-weight:700}
+.think{background:#fdf2e9;border-color:#e67e22}.think::before{content:"🤔 Think About It: ";font-weight:700}
+.real{background:#e8f6f3;border-color:#16a085}.real::before{content:"🏢 Real World: ";font-weight:700}
+table{width:100%;border-collapse:collapse;margin:15px 0;font-size:.95em}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--bd)}
+th{background:var(--p);color:#fff;font-weight:600}
+tr:nth-child(even){background:#f8f9fa}tr:hover{background:#eaf2f8}
+.diagram{display:flex;align-items:center;justify-content:center;gap:12px;margin:25px 0;flex-wrap:wrap}
+.dbox{padding:16px 22px;border-radius:12px;text-align:center;font-weight:600;min-width:120px;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+.darr{font-size:2em;color:var(--lt)}
+.flow{display:flex;align-items:stretch;gap:0;margin:22px 0;flex-wrap:wrap;justify-content:center}
+.fstep{padding:14px 18px;text-align:center;border-radius:10px;min-width:120px;font-size:.9em;display:flex;flex-direction:column;justify-content:center}
+.fstep strong{display:block;margin-bottom:3px}
+.farr{display:flex;align-items:center;font-size:1.5em;color:#bdc3c7;padding:0 5px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}
+.ccard{border-radius:12px;padding:20px;border:2px solid}
+.ccard h4{margin-top:0}
+.ccard.good{border-color:var(--g);background:#f0faf3}
+.ccard.bad{border-color:var(--r);background:#fdf0ef}
+pre{background:#2c3e50;color:#ecf0f1;padding:18px 22px;border-radius:10px;overflow-x:auto;margin:15px 0;line-height:1.5;font-size:.88em}
+pre code{background:none;padding:0;color:inherit}
+code{background:#ecf0f1;padding:2px 6px;border-radius:4px;font-family:'Cascadia Code','Consolas',monospace;font-size:.9em}
+.tag{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.8em;font-weight:600;margin:2px}
+.tag-b{background:#d6eaf8;color:#2471a3}.tag-g{background:#d5f5e3;color:#1e8449}
+.tag-r{background:#fadbd8;color:#c0392b}.tag-p{background:#e8daef;color:#6c3483}
+.highlight{background:linear-gradient(120deg,#ffeaa7 0%,#fdcb6e 100%);padding:2px 5px;border-radius:3px}
+.svg-chart{margin:20px auto;display:block}
+[id]{scroll-margin-top:20px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin:20px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}
+.gcard{border:2px solid var(--bd);border-radius:12px;padding:20px;text-align:center}
+.gcard .icon{font-size:2.5em;margin:8px 0}
+.gcard h4{margin:8px 0 5px}
+.spectrum{display:flex;align-items:center;margin:25px 0;border-radius:30px;overflow:hidden;height:60px}
+.spectrum-seg{flex:1;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:.85em;text-align:center;padding:5px}
+.step-list{counter-reset:steps}
+.step-list li{counter-increment:steps;list-style:none;padding:12px 15px 12px 55px;margin:8px 0;background:#fff;border-radius:8px;border:1px solid #eee;position:relative}
+.step-list li::before{content:counter(steps);position:absolute;left:12px;top:12px;background:var(--a);color:#fff;width:30px;height:30px;border-radius:50%;text-align:center;line-height:30px;font-weight:700;font-size:.9em}
+.nav-footer{display:flex;justify-content:space-between;padding:30px 0;margin-top:30px;border-top:2px solid var(--bd)}
+.nav-footer a{color:var(--a);text-decoration:none;font-weight:600;font-size:1.1em}
+.nav-footer a:hover{text-decoration:underline}
+@media print{.ch{break-inside:avoid}}
+@media(max-width:768px){.grid3{grid-template-columns:1fr}.compare,.grid2{grid-template-columns:1fr}.ch{padding:25px 20px}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Insurance Pricing Modelling</h1>
+  <div class="sub">Frequency × Severity, The Tweedie Distribution & Maximum Likelihood</div>
+  <div class="parttag">PART 2 of 5: THE INSURANCE DISTRIBUTIONS</div>
+</div>
+
+<nav class="breadcrumb">
+  <a href="index.html">🏠 Course Home</a> &gt;
+  <a href="Part1_Foundations.html">Part 1: Foundations</a> &gt;
+  <strong>Part 2: Distributions & Tweedie</strong> &gt;
+  Chapters 9–14
+</nav>
+
+<div class="wrap">
+
+<!-- ═══════════════════ CHAPTER 9 ═══════════════════ -->
+<div class="ch" id="ch9">
+<h2>Chapter 9: Frequency × Severity — The Traditional Approach</h2>
+
+<div class="box eli5">
+You want to know how much money to save for car repairs this year.<br>
+<strong>Step 1:</strong> How many times will your car break down? (maybe 0.3 times/year on average)<br>
+<strong>Step 2:</strong> When it breaks, how much does the mechanic charge? (maybe $2,000)<br>
+<strong>Answer:</strong> Save 0.3 × $2,000 = <strong>$600/year</strong>. That's insurance pricing in a nutshell.
+</div>
+
+<h3>The Fundamental Equation of Insurance Pricing</h3>
+<div class="box form">
+<strong>Pure Premium = Frequency × Severity</strong><br><br>
+E[Total Loss] = E[Number of Claims] × E[Cost per Claim]<br><br>
+In symbols: E[Y] = E[N] × E[S]
+</div>
+
+<h3>The Two-Model Approach</h3>
+<div class="diagram">
+  <div class="dbox" style="background:#d6eaf8;border:2px solid #2980b9;">
+    <strong>Frequency Model</strong><br>
+    Response: # claims<br>
+    Data: ALL policies<br>
+    Distribution: <span class="tag tag-b">Poisson</span>
+  </div>
+  <div class="darr">×</div>
+  <div class="dbox" style="background:#fadbd8;border:2px solid #e74c3c;">
+    <strong>Severity Model</strong><br>
+    Response: $ per claim<br>
+    Data: Claims > $0 ONLY<br>
+    Distribution: <span class="tag tag-r">Gamma</span>
+  </div>
+  <div class="darr">=</div>
+  <div class="dbox" style="background:#d5f5e3;border:2px solid var(--g);">
+    <strong>Pure Premium</strong><br>
+    Expected total loss<br>
+    <span class="tag tag-g">$$$</span>
+  </div>
+</div>
+
+<h3>Worked Example From Your Data</h3>
+<table>
+  <tr><th>Step</th><th>What We Measure</th><th>Your Data</th></tr>
+  <tr><td>Total policies</td><td>How many rows</td><td>35,650</td></tr>
+  <tr><td>Policies with claims</td><td>Claims > $0</td><td>3,610 (about 10.1%)</td></tr>
+  <tr><td><strong>Average Frequency</strong></td><td>Total claims ÷ Total policies</td><td><strong>λ ≈ 0.14</strong></td></tr>
+  <tr><td>Average claim size (given a claim exists)</td><td>Mean of non-zero claims</td><td><strong>$128,000</strong></td></tr>
+  <tr><td><strong>Pure Premium</strong></td><td>0.14 × $128,000</td><td><strong>$17,920/policy</strong></td></tr>
+</table>
+
+<div class="box eli5">
+So on average, each policy in your construction portfolio costs you about $17,920 in claims. That's the <strong>minimum</strong> you'd need to charge — before adding expenses and profit.
+</div>
+
+<h3>Why Do We Build Two Separate Models?</h3>
+
+<div class="box think">
+<strong>Why not just build one model directly on total claims?</strong><br><br>
+Good question! There are actually good reasons for splitting:<br>
+1. <strong>Different drivers:</strong> What makes claims more FREQUENT (e.g., bad safety culture) may differ from what makes them more EXPENSIVE (e.g., expensive jurisdiction like US courts)<br>
+2. <strong>Different data:</strong> Frequency uses all 35,650 policies. Severity only uses the 3,610 with claims.<br>
+3. <strong>Better diagnostics:</strong> If the model is wrong, you can pinpoint whether frequency or severity is off.<br><br>
+BUT: there's a shortcut that combines both → Tweedie (Chapter 11).
+</div>
+
+<h3>How Each Model Works</h3>
+
+<h4>Frequency Model (Poisson GLM)</h4>
+<pre><code># R code
+glm(n_claims ~ log10(exposure) + country + trade,
+    family = poisson(link = "log"),
+    offset = log(duration),
+    data = all_policies)
+
+# Python equivalent
+sm.GLM(y_freq, X, family=sm.families.Poisson(), offset=log_duration).fit()</code></pre>
+
+<p><strong>Key details:</strong></p>
+<ul>
+  <li>Response: number of claims (0, 1, 2, ...)</li>
+  <li>Uses ALL policies (including zeros)</li>
+  <li>Offset = log(duration) — a 2-year policy has ~2× the chance of a claim</li>
+  <li>Poisson distribution — natural for count data</li>
+  <li>Log link — ensures positive predictions, multiplicative effects</li>
+</ul>
+
+<h4>Severity Model (Gamma GLM)</h4>
+<pre><code># R code
+glm(avg_claim_size ~ log10(exposure) + country + trade,
+    family = Gamma(link = "log"),
+    data = claims_only)  # ONLY policies where claims > 0
+
+# Python equivalent
+sm.GLM(y_sev, X, family=sm.families.Gamma(link=sm.families.links.Log())).fit()</code></pre>
+
+<p><strong>Key details:</strong></p>
+<ul>
+  <li>Response: average claim size (positive continuous)</li>
+  <li>Uses ONLY policies with claims > $0</li>
+  <li>NO offset (duration doesn't affect how big a claim is, only how likely)</li>
+  <li>Gamma distribution — positive, right-skewed</li>
+  <li>Log link — same benefits as frequency model</li>
+</ul>
+
+<h3>The Problems With Two Models</h3>
+<div class="compare">
+  <div class="ccard bad">
+    <h4>❌ Drawbacks</h4>
+    <ul>
+      <li>Double the work: build, validate, monitor TWO models</li>
+      <li>Independence assumption: assumes frequency and severity are independent (often violated)</li>
+      <li>Severity model only uses 10% of data (policies with claims)</li>
+      <li>Combining predictions requires manual multiplication</li>
+    </ul>
+  </div>
+  <div class="ccard good">
+    <h4>✅ Advantages</h4>
+    <ul>
+      <li>Better diagnostics — see what's driving each component</li>
+      <li>Different variables can affect frequency vs severity</li>
+      <li>More interpretable for actuarial communication</li>
+      <li>Traditional approach — familiar to regulators</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 10 ═══════════════════ -->
+<div class="ch" id="ch10">
+<h2>Chapter 10: Maximum Likelihood Estimation (MLE)</h2>
+
+<div class="box eli5">
+You found a bag of marbles. Some are red, some are blue. You pull out 7 red and 3 blue. You want to guess what fraction of ALL marbles in the bag are red. MLE says: "Find the fraction that would have made your sample of 7 red and 3 blue the MOST LIKELY outcome." The answer is obviously 70%. That's MLE — find the parameter that makes your observed data most probable.
+</div>
+
+<h3>The Idea</h3>
+<p>Given observed data y₁, y₂, ..., yₙ and a model with parameters θ:</p>
+
+<div class="box form">
+<strong>Likelihood:</strong> L(θ) = P(data | θ) = Π f(yᵢ | θ)<br><br>
+<strong>Log-likelihood:</strong> ℓ(θ) = Σ log f(yᵢ | θ)<br><br>
+<strong>MLE:</strong> θ̂ = argmax ℓ(θ) — the parameters that make the data most likely
+</div>
+
+<h3>MLE for the Poisson — Step by Step</h3>
+
+<div class="box eli5">
+Let's walk through MLE for Poisson with REAL numbers. You have 10 policies with these claim counts: [0, 0, 0, 0, 0, 0, 0, 1, 0, 2]. What's the best λ?
+</div>
+
+<ol class="step-list">
+  <li><strong>Write the likelihood:</strong> L(λ) = Π P(yᵢ | λ) = Π [e<sup>−λ</sup> × λ<sup>yᵢ</sup> / yᵢ!]</li>
+  <li><strong>Take the log:</strong> ℓ(λ) = Σ [−λ + yᵢ × log(λ) − log(yᵢ!)]<br>
+  = −nλ + (Σ yᵢ) × log(λ) − Σ log(yᵢ!)</li>
+  <li><strong>Take the derivative and set to 0:</strong><br>
+  dℓ/dλ = −n + (Σ yᵢ) / λ = 0</li>
+  <li><strong>Solve:</strong> λ̂ = (Σ yᵢ) / n = <strong>the sample mean!</strong></li>
+</ol>
+
+<p>For our example: λ̂ = (0+0+0+0+0+0+0+1+0+2) / 10 = <strong>0.3</strong></p>
+
+<div class="box key">
+For Poisson, MLE gives λ̂ = sample mean. That's comforting — the best estimate of the average rate is just the average! For more complex distributions (like Gamma or Tweedie), there's no simple closed-form solution, so we use numerical optimization (the computer finds it iteratively).
+</div>
+
+<h3>MLE for GLMs — The IRLS Algorithm</h3>
+
+<p>In a GLM, we don't estimate a single λ. We estimate <strong>coefficients</strong> β₀, β₁, β₂... that predict different λ's for different risks. MLE for GLMs uses an algorithm called <strong>IRLS</strong> (Iteratively Reweighted Least Squares):</p>
+
+<ol class="step-list">
+  <li><strong>Start with a guess</strong> for coefficients β</li>
+  <li><strong>Compute predictions</strong> μ = g<sup>−1</sup>(Xβ) using the link function</li>
+  <li><strong>Compute weights</strong> based on the variance function (heavier weights for more reliable observations)</li>
+  <li><strong>Fit a weighted regression</strong> to get improved β</li>
+  <li><strong>Repeat</strong> until β stops changing (convergence)</li>
+</ol>
+
+<div class="box eli5">
+Imagine you're adjusting a recipe. You make a batch, taste it, adjust the salt. Make another batch, taste, adjust. Keep going until it tastes perfect. That's IRLS — the computer adjusts the coefficients in rounds until the model fits as well as possible.
+</div>
+
+<h3>Log-Likelihood: How We Compare Models</h3>
+<p>The log-likelihood tells us how well a model fits the data. Higher = better fit. Two important derived metrics:</p>
+
+<div class="grid2">
+  <div class="gcard" style="border-color:#8e44ad;">
+    <div class="icon">📊</div>
+    <h4>AIC</h4>
+    <p>AIC = −2ℓ + 2k</p>
+    <p>Penalizes for number of parameters (k).<br><strong>Lower = better.</strong></p>
+    <p>Use when: comparing non-nested models</p>
+  </div>
+  <div class="gcard" style="border-color:#16a085;">
+    <div class="icon">📈</div>
+    <h4>BIC</h4>
+    <p>BIC = −2ℓ + k × log(n)</p>
+    <p>Stronger penalty for parameters than AIC.<br><strong>Lower = better.</strong></p>
+    <p>Use when: want a simpler model</p>
+  </div>
+</div>
+
+<div class="box key">
+<strong>AIC rule of thumb:</strong> If Model A has AIC 1000 lower than Model B, A is dramatically better. If the difference is < 2, they're essentially equivalent. Differences of 2–10 suggest moderate evidence.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 11 ═══════════════════ -->
+<div class="ch" id="ch11">
+<h2>Chapter 11: The Tweedie Distribution — The Insurance Distribution</h2>
+
+<div class="box eli5">
+Instead of separately asking "how many phone calls today?" (Poisson) and "how long is each call?" (Gamma), Tweedie asks one question: <strong>"How much total time did you spend on the phone today?"</strong><br><br>
+Answer might be 0 minutes (no calls = most days), 15 minutes (one short call), or 90 minutes (a few long calls). ONE distribution handles it all.
+</div>
+
+<h3>The Mathematical Definition</h3>
+
+<div class="box form">
+If N ~ Poisson(λ) and each claim Sᵢ ~ Gamma(α, β), then:<br><br>
+<strong>Y = S₁ + S₂ + ... + S<sub>N</sub> ~ Tweedie(μ, φ, p)</strong><br><br>
+This is called a <strong>Compound Poisson-Gamma</strong> distribution.
+</div>
+
+<h3>The Magic: Tweedie = Poisson × Gamma Automatically</h3>
+
+<svg class="svg-chart" width="750" height="200" viewBox="0 0 750 200">
+  <!-- Poisson box -->
+  <rect x="20" y="40" width="180" height="120" rx="12" fill="#d6eaf8" stroke="#2980b9" stroke-width="2"/>
+  <text x="110" y="70" text-anchor="middle" font-weight="bold" font-size="14" fill="#2980b9">FREQUENCY</text>
+  <text x="110" y="92" text-anchor="middle" font-size="12" fill="#2c3e50">N ~ Poisson(λ)</text>
+  <text x="110" y="115" text-anchor="middle" font-size="11" fill="#7f8c8d">"How many claims?"</text>
+  <text x="110" y="135" text-anchor="middle" font-size="10" fill="#7f8c8d">Uses ALL policies</text>
+  
+  <!-- Plus -->
+  <text x="230" y="105" font-size="30" fill="#bdc3c7" text-anchor="middle">+</text>
+  
+  <!-- Gamma box -->
+  <rect x="260" y="40" width="180" height="120" rx="12" fill="#fadbd8" stroke="#e74c3c" stroke-width="2"/>
+  <text x="350" y="70" text-anchor="middle" font-weight="bold" font-size="14" fill="#e74c3c">SEVERITY</text>
+  <text x="350" y="92" text-anchor="middle" font-size="12" fill="#2c3e50">Sᵢ ~ Gamma(α, β)</text>
+  <text x="350" y="115" text-anchor="middle" font-size="11" fill="#7f8c8d">"How big each claim?"</text>
+  <text x="350" y="135" text-anchor="middle" font-size="10" fill="#7f8c8d">Uses claims > $0</text>
+  
+  <!-- Arrow -->
+  <line x1="450" y1="100" x2="510" y2="100" stroke="#8e44ad" stroke-width="3" marker-end="url(#arr2)"/>
+  <text x="480" y="88" text-anchor="middle" font-size="11" fill="#8e44ad" font-weight="bold">Sum</text>
+  <defs><marker id="arr2" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0L10,5L0,10Z" fill="#8e44ad"/></marker></defs>
+  
+  <!-- Tweedie box -->
+  <rect x="520" y="30" width="210" height="140" rx="12" fill="#e8daef" stroke="#8e44ad" stroke-width="3"/>
+  <text x="625" y="62" text-anchor="middle" font-weight="bold" font-size="16" fill="#8e44ad">TWEEDIE</text>
+  <text x="625" y="85" text-anchor="middle" font-size="12" fill="#2c3e50">Y = ΣSᵢ ~ Tweedie(μ, φ, p)</text>
+  <text x="625" y="108" text-anchor="middle" font-size="11" fill="#7f8c8d">"Total loss per policy"</text>
+  <text x="625" y="128" text-anchor="middle" font-size="11" fill="#27ae60" font-weight="bold">ONE model, ALL policies</text>
+  <text x="625" y="148" text-anchor="middle" font-size="11" fill="#27ae60" font-weight="bold">Handles zeros naturally!</text>
+</svg>
+
+<h3>The Power Parameter p — The Key to Understanding Tweedie</h3>
+
+<p>Tweedie has a special parameter <strong>p</strong> (the "power" or "variance power") that controls the mix of Poisson and Gamma:</p>
+
+<div class="spectrum">
+  <div class="spectrum-seg" style="background:#27ae60;">p=1<br>Pure Poisson</div>
+  <div class="spectrum-seg" style="background:#2ecc71;">p=1.2<br>Many zeros</div>
+  <div class="spectrum-seg" style="background:#2980b9;font-size:1.1em;flex:1.5;">p=1.5 ⭐<br>YOUR MODEL</div>
+  <div class="spectrum-seg" style="background:#e67e22;">p=1.8<br>Fewer zeros</div>
+  <div class="spectrum-seg" style="background:#e74c3c;">p=2<br>Pure Gamma</div>
+</div>
+
+<table>
+  <tr><th>p value</th><th>Distribution</th><th>% zeros</th><th>Variance function</th></tr>
+  <tr><td>p = 0</td><td>Normal</td><td>N/A</td><td>Var = φ (constant)</td></tr>
+  <tr><td>p = 1</td><td>Poisson</td><td>Depends on λ</td><td>Var = φμ</td></tr>
+  <tr><td style="background:#eaf2f8;font-weight:bold;">1 &lt; p &lt; 2</td><td style="background:#eaf2f8;font-weight:bold;">Compound Poisson-Gamma ⭐</td><td style="background:#eaf2f8;font-weight:bold;">Many</td><td style="background:#eaf2f8;font-weight:bold;">Var = φμ<sup>p</sup></td></tr>
+  <tr><td>p = 2</td><td>Gamma</td><td>0% (no zeros)</td><td>Var = φμ²</td></tr>
+  <tr><td>p = 3</td><td>Inverse Gaussian</td><td>0%</td><td>Var = φμ³</td></tr>
+</table>
+
+<div class="box key">
+<strong>Why p = 1.5 for your construction model:</strong>
+<ul>
+  <li>~90% zeros → strong Poisson component (pulls toward p=1)</li>
+  <li>Non-zero claims are heavily right-skewed → Gamma component (pulls toward p=2)</li>
+  <li>p = 1.5 is the balanced midpoint that actuaries have found works well for GL</li>
+</ul>
+</div>
+
+<h3>How to Estimate p From Data</h3>
+
+<pre><code># R: Profile likelihood for p
+library(tweedie)
+out <- tweedie.profile(claims ~ log10(exposure) + country,
+                        data = df,
+                        p.vec = seq(1.1, 1.9, by=0.1))
+# Picks the p that maximizes the likelihood
+
+# Or just use p=1.5 as a good default for insurance</code></pre>
+
+<div class="box real">
+In practice, most insurers use p = 1.5 as a starting point for GL/construction. Some do a profile likelihood search (trying p = 1.1, 1.2, ..., 1.9 and picking the best). Your R code uses <code>tw(p=1.5)</code> directly.
+</div>
+
+<h3>Tweedie vs Freq × Sev — They Give the Same Answer!</h3>
+
+<div class="box eli5">
+Here's the beautiful part: Tweedie with p between 1 and 2 IS MATHEMATICALLY IDENTICAL to Freq × Sev (Poisson × Gamma). You're not losing anything by using Tweedie — you're just doing the same thing more efficiently in one step.
+</div>
+
+<div class="compare">
+  <div class="ccard bad">
+    <h4>Freq × Sev (2 models)</h4>
+    <ul>
+      <li>Build & maintain 2 models</li>
+      <li>Cross-validate each separately</li>
+      <li>Multiply at the end</li>
+      <li>Assumes independence</li>
+      <li>Severity model uses only 10% of data</li>
+    </ul>
+  </div>
+  <div class="ccard good">
+    <h4>Tweedie (1 model) ✅</h4>
+    <ul>
+      <li>Single model for total loss</li>
+      <li>One cross-validation</li>
+      <li>Handles zeros automatically</li>
+      <li>No independence assumption needed</li>
+      <li>Uses ALL data (100%)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="box key">
+<strong>Industry standard:</strong> Most modern pricing teams use Tweedie as the default. Freq × Sev is still used for: (a) diagnostics, (b) communication to non-technical stakeholders, (c) regulatory requirements that mandate separate models.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 12 ═══════════════════ -->
+<div class="ch" id="ch12">
+<h2>Chapter 12: The Variance Function — Why It's the Most Important Concept</h2>
+
+<div class="box eli5">
+Imagine you're throwing darts at a target. A beginner's darts are spread all over (high variance). A pro's darts cluster tightly (low variance). Now imagine the <em>target changes size</em> — bigger target = darts spread out more. The relationship between target size (mean) and dart spread (variance) is the variance function. In insurance: bigger companies have more variable losses.
+</div>
+
+<h3>Var(Y) = φ × V(μ) — The Key Equation</h3>
+
+<div class="box form">
+In every GLM, the variance of the response depends on the mean through a <strong>variance function</strong> V(μ):<br><br>
+<strong>Var(Y) = φ × V(μ)</strong><br><br>
+Where φ is the dispersion parameter and V(μ) depends on the distribution chosen.
+</div>
+
+<h3>Variance Functions for Each Distribution</h3>
+
+<svg class="svg-chart" width="700" height="280" viewBox="0 0 700 280">
+  <text x="350" y="18" text-anchor="middle" font-weight="bold" font-size="13" fill="#2c3e50">How Variance Grows With the Mean (μ)</text>
+  
+  <!-- Axes -->
+  <line x1="60" y1="30" x2="60" y2="250" stroke="#bdc3c7" stroke-width="1"/>
+  <line x1="60" y1="250" x2="660" y2="250" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="30" y="140" text-anchor="middle" font-size="10" fill="#7f8c8d" transform="rotate(-90 30 140)">Variance</text>
+  <text x="360" y="272" text-anchor="middle" font-size="10" fill="#7f8c8d">Mean (μ) →</text>
+  
+  <!-- Normal: constant -->
+  <line x1="80" y1="220" x2="640" y2="220" stroke="#95a5a6" stroke-width="2.5"/>
+  <text x="640" y="215" font-size="10" fill="#95a5a6" font-weight="bold">Normal: V(μ)=1 (flat)</text>
+  
+  <!-- Poisson: linear -->
+  <line x1="80" y1="240" x2="640" y2="100" stroke="#27ae60" stroke-width="2.5"/>
+  <text x="550" y="90" font-size="10" fill="#27ae60" font-weight="bold">Poisson: V(μ)=μ</text>
+  
+  <!-- Tweedie p=1.5 -->
+  <path d="M80,242 Q200,220 350,160 Q500,90 640,45" fill="none" stroke="#2980b9" stroke-width="3"/>
+  <text x="550" y="38" font-size="11" fill="#2980b9" font-weight="bold">Tweedie p=1.5: V(μ)=μ^1.5 ⭐</text>
+  
+  <!-- Gamma: quadratic -->
+  <path d="M80,245 Q200,230 350,180 Q500,80 600,35" fill="none" stroke="#e74c3c" stroke-width="2.5"/>
+  <text x="500" y="60" font-size="10" fill="#e74c3c" font-weight="bold">Gamma: V(μ)=μ²</text>
+</svg>
+
+<table>
+  <tr><th>Distribution</th><th>V(μ)</th><th>Var(Y) = φ × V(μ)</th><th>In English</th></tr>
+  <tr><td>Normal</td><td>1</td><td>φ (constant)</td><td>Variance doesn't depend on mean</td></tr>
+  <tr><td>Poisson</td><td>μ</td><td>φμ</td><td>Variance grows linearly with mean</td></tr>
+  <tr style="background:#eaf2f8;"><td><strong>Tweedie (p=1.5)</strong></td><td><strong>μ<sup>1.5</sup></strong></td><td><strong>φμ<sup>1.5</sup></strong></td><td><strong>Between Poisson and Gamma</strong></td></tr>
+  <tr><td>Gamma</td><td>μ²</td><td>φμ²</td><td>Variance grows as square of mean</td></tr>
+</table>
+
+<div class="box key">
+<strong>Why this matters:</strong> Choosing the wrong variance function means your model gives wrong standard errors, wrong confidence intervals, and wrong p-values. It also affects predictions for large vs small companies. The variance function is MORE important than the exact distribution shape in many practical situations.
+</div>
+
+<h3>The Dispersion Parameter φ</h3>
+
+<div class="box eli5">
+If the variance function V(μ) tells you the <em>shape</em> of how variance grows with the mean, then φ is the <em>volume knob</em>. Higher φ = more spread, lower φ = tighter predictions. Think of it as overall "noisiness" of the data.
+</div>
+
+<table>
+  <tr><th>Distribution</th><th>φ</th><th>Notes</th></tr>
+  <tr><td>Poisson</td><td>Fixed at 1 (technically)</td><td>In quasi-Poisson, φ is estimated to handle overdispersion</td></tr>
+  <tr><td>Gamma</td><td>Estimated from data</td><td>φ = 1/α where α is the shape parameter</td></tr>
+  <tr><td>Tweedie</td><td>Estimated from data</td><td>Controls overall level of randomness</td></tr>
+</table>
+</div>
+
+<!-- ═══════════════════ CHAPTER 13 ═══════════════════ -->
+<div class="ch" id="ch13">
+<h2>Chapter 13: Overdispersion — When Poisson Isn't Enough</h2>
+
+<div class="box eli5">
+Poisson says: "if the average is 3, the spread should also be 3." But what if the actual spread is 10? That's called <strong>overdispersion</strong> — your data is messier than Poisson expects. It's like expecting all students to score within 5 points of the average, but some score 0 and some score 100.
+</div>
+
+<h3>How to Detect Overdispersion</h3>
+<pre><code># In R, after fitting a Poisson GLM:
+model <- glm(n_claims ~ exposure + country, family=poisson, data=df)
+
+# Check: residual deviance / degrees of freedom
+# If >> 1, you have overdispersion
+summary(model)$deviance / summary(model)$df.residual
+# Your data: this might be ~2.5 (overdispersed!)
+
+# In Python:
+print(f"Dispersion: {model.deviance / model.df_resid:.2f}")
+# If > 1.5, suspect overdispersion</code></pre>
+
+<h3>Why Overdispersion Happens in Insurance</h3>
+
+<div class="box think">
+Overdispersion occurs because the Poisson model assumes all policies with the same exposure have the same λ. But in reality, even among policies with $10M exposure:
+<ul>
+  <li>Some have great safety programs → low actual λ</li>
+  <li>Some have terrible safety → high actual λ</li>
+  <li>This <strong>unobserved heterogeneity</strong> creates extra variability</li>
+</ul>
+The more risk factors your model includes, the less overdispersion you'll see (because you're explaining the variation).
+</div>
+
+<h3>Three Solutions for Overdispersion</h3>
+
+<table>
+  <tr><th>Solution</th><th>What It Does</th><th>Code</th><th>When to Use</th></tr>
+  <tr>
+    <td><strong>Quasi-Poisson</strong></td>
+    <td>Adds a dispersion parameter φ. Same coefficients as Poisson, but wider standard errors.</td>
+    <td><code>family=quasipoisson</code></td>
+    <td>Quick fix. Same point estimates, honest uncertainty.</td>
+  </tr>
+  <tr>
+    <td><strong>Negative Binomial</strong></td>
+    <td>A proper distribution for overdispersed counts. Var = μ + μ²/θ.</td>
+    <td><code>MASS::glm.nb()</code></td>
+    <td>When overdispersion is severe. More flexible than quasi-Poisson.</td>
+  </tr>
+  <tr style="background:#eaf2f8;">
+    <td><strong>Switch to Tweedie ⭐</strong></td>
+    <td>Sidestep the problem entirely. Model total loss, not counts.</td>
+    <td><code>family=tw(p=1.5)</code></td>
+    <td>Industry standard. Avoids the whole freq/sev split.</td>
+  </tr>
+</table>
+
+<div class="box key">
+In practice, overdispersion in the frequency model is one more reason to prefer the Tweedie approach: you avoid the issue entirely by modelling total losses instead of counts.
+</div>
+
+<h3>The Negative Binomial — A Quick Look</h3>
+
+<div class="box form">
+Negative Binomial: P(X=k) = C(k+r-1, k) × (1-p)<sup>r</sup> × p<sup>k</sup><br><br>
+Mean = μ &nbsp;&nbsp;&nbsp; Variance = μ + μ²/θ &nbsp;&nbsp;&nbsp; (always > μ, so overdispersed by design)
+</div>
+
+<div class="box eli5">
+Think of Negative Binomial as "Poisson with extra randomness." In the Poisson, λ is fixed. In the Negative Binomial, λ itself is random (it follows a Gamma distribution). This extra layer of randomness naturally creates overdispersion.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 14 ═══════════════════ -->
+<div class="ch" id="ch14">
+<h2>Chapter 14: Putting It All Together — Distribution Summary</h2>
+
+<h3>The Complete Distribution Landscape for Insurance</h3>
+
+<svg class="svg-chart" width="800" height="350" viewBox="0 0 800 350">
+  <text x="400" y="20" text-anchor="middle" font-weight="bold" font-size="15" fill="#2c3e50">Distribution Decision Tree for Insurance Pricing</text>
+  
+  <!-- Root -->
+  <rect x="290" y="40" width="220" height="40" rx="10" fill="#2c3e50"/>
+  <text x="400" y="65" text-anchor="middle" fill="#fff" font-weight="bold" font-size="12">What are you modelling?</text>
+  
+  <!-- Left branch: Counts -->
+  <line x1="350" y1="80" x2="160" y2="120" stroke="#2980b9" stroke-width="2"/>
+  <rect x="60" y="120" width="200" height="35" rx="8" fill="#d6eaf8" stroke="#2980b9" stroke-width="2"/>
+  <text x="160" y="142" text-anchor="middle" font-weight="bold" font-size="12" fill="#2980b9">Claim COUNTS (0,1,2...)</text>
+  
+  <!-- Poisson -->
+  <line x1="120" y1="155" x2="80" y2="185" stroke="#2980b9" stroke-width="1.5"/>
+  <rect x="10" y="185" width="140" height="45" rx="8" fill="#eaf2f8"/>
+  <text x="80" y="205" text-anchor="middle" font-weight="bold" font-size="11" fill="#2980b9">Poisson</text>
+  <text x="80" y="220" text-anchor="middle" font-size="9" fill="#7f8c8d">Var = Mean</text>
+  
+  <!-- NB -->
+  <line x1="200" y1="155" x2="240" y2="185" stroke="#2980b9" stroke-width="1.5"/>
+  <rect x="165" y="185" width="150" height="45" rx="8" fill="#eaf2f8"/>
+  <text x="240" y="205" text-anchor="middle" font-weight="bold" font-size="11" fill="#2980b9">Negative Binomial</text>
+  <text x="240" y="220" text-anchor="middle" font-size="9" fill="#7f8c8d">Var > Mean</text>
+  
+  <!-- Right branch: Amounts -->
+  <line x1="450" y1="80" x2="600" y2="120" stroke="#e74c3c" stroke-width="2"/>
+  <rect x="500" y="120" width="200" height="35" rx="8" fill="#fadbd8" stroke="#e74c3c" stroke-width="2"/>
+  <text x="600" y="142" text-anchor="middle" font-weight="bold" font-size="12" fill="#e74c3c">Claim AMOUNTS ($)</text>
+  
+  <!-- Gamma -->
+  <line x1="560" y1="155" x2="520" y2="185" stroke="#e74c3c" stroke-width="1.5"/>
+  <rect x="450" y="185" width="140" height="45" rx="8" fill="#fdedec"/>
+  <text x="520" y="205" text-anchor="middle" font-weight="bold" font-size="11" fill="#e74c3c">Gamma</text>
+  <text x="520" y="220" text-anchor="middle" font-size="9" fill="#7f8c8d">Light tail, GLM ✓</text>
+  
+  <!-- Lognormal -->
+  <line x1="640" y1="155" x2="680" y2="185" stroke="#e74c3c" stroke-width="1.5"/>
+  <rect x="615" y="185" width="140" height="45" rx="8" fill="#fdedec"/>
+  <text x="685" y="205" text-anchor="middle" font-weight="bold" font-size="11" fill="#e74c3c">Lognormal</text>
+  <text x="685" y="220" text-anchor="middle" font-size="9" fill="#7f8c8d">Heavy tail, ILFs</text>
+  
+  <!-- Middle branch: Total Loss -->
+  <line x1="400" y1="80" x2="400" y2="120" stroke="#8e44ad" stroke-width="2"/>
+  <rect x="310" y="120" width="180" height="35" rx="8" fill="#e8daef" stroke="#8e44ad" stroke-width="3"/>
+  <text x="400" y="142" text-anchor="middle" font-weight="bold" font-size="12" fill="#8e44ad">TOTAL LOSS (zeros + $)</text>
+  
+  <!-- Tweedie -->
+  <line x1="400" y1="155" x2="400" y2="185" stroke="#8e44ad" stroke-width="2"/>
+  <rect x="320" y="185" width="160" height="50" rx="10" fill="#8e44ad"/>
+  <text x="400" y="208" text-anchor="middle" font-weight="bold" font-size="13" fill="#fff">TWEEDIE ⭐</text>
+  <text x="400" y="226" text-anchor="middle" font-size="10" fill="#ddd">Your main model</text>
+  
+  <!-- Bottom summary -->
+  <rect x="100" y="270" width="600" height="65" rx="10" fill="#fff" stroke="#2c3e50" stroke-width="1"/>
+  <text x="400" y="295" text-anchor="middle" font-weight="bold" font-size="13" fill="#2c3e50">🏆 Industry Standard Approach</text>
+  <text x="400" y="315" text-anchor="middle" font-size="11" fill="#7f8c8d">Main model: Tweedie GAM on total loss (1 model)</text>
+  <text x="400" y="330" text-anchor="middle" font-size="11" fill="#7f8c8d">Diagnostic: Freq × Sev as sanity check (2 models, compare results)</text>
+</svg>
+
+<h3>Master Reference Table</h3>
+<table>
+  <tr><th>Distribution</th><th>For</th><th>Range</th><th>Variance</th><th>In GLM?</th><th>Use Case</th></tr>
+  <tr><td>Normal</td><td>—</td><td>(−∞, +∞)</td><td>Constant</td><td>✅</td><td>❌ Not for insurance</td></tr>
+  <tr><td>Poisson</td><td>Counts</td><td>0, 1, 2, ...</td><td>V = μ</td><td>✅</td><td>Frequency model</td></tr>
+  <tr><td>Neg. Binomial</td><td>Counts</td><td>0, 1, 2, ...</td><td>V = μ + μ²/θ</td><td>✅</td><td>Overdispersed frequency</td></tr>
+  <tr><td>Gamma</td><td>Amounts</td><td>(0, ∞)</td><td>V = μ²</td><td>✅</td><td>Severity model</td></tr>
+  <tr><td>Lognormal</td><td>Amounts</td><td>(0, ∞)</td><td>Complex</td><td>❌</td><td>ILF curves</td></tr>
+  <tr><td>Pareto</td><td>Extremes</td><td>[x<sub>m</sub>, ∞)</td><td>Complex</td><td>❌</td><td>Excess layer / large loss</td></tr>
+  <tr style="background:#eaf2f8;font-weight:bold;"><td>Tweedie (p=1.5)</td><td>Total loss</td><td>[0, ∞)</td><td>V = μ<sup>p</sup></td><td>✅</td><td>⭐ MAIN MODEL</td></tr>
+</table>
+
+<h3>What You Now Know</h3>
+<div class="box ok">
+At this point, you understand:
+<ul>
+  <li>Why Normal fails (negative predictions, no zeros, constant variance)</li>
+  <li>Poisson for counting claims (frequency)</li>
+  <li>Gamma for measuring claim sizes (severity)</li>
+  <li>Freq × Sev = traditional approach, but needs 2 models</li>
+  <li>Tweedie = Poisson × Gamma in ONE distribution</li>
+  <li>MLE = how models estimate parameters</li>
+  <li>The variance function connects all distributions</li>
+</ul>
+<strong>Next up:</strong> How to go from distributions to actual MODELS (GLM framework) → Part 3
+</div>
+</div>
+
+<!-- NAV FOOTER -->
+<div class="nav-footer">
+  <a href="Part1_Foundations.html">← Part 1: Foundations</a>
+  <span style="color:var(--lt);">Part 2 of 5: Distributions & Tweedie</span>
+  <a href="Part3_GLM.html">Part 3: GLM Deep Dive →</a>
+</div>
+
+</div>
+<div style="text-align:center;padding:30px;color:var(--lt);font-size:.85em;">Insurance Pricing Modelling Complete Course | Built for Ayush Sharma</div>
+</body>
+</html>

@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Part 4: GAM, Validation & Advanced — Insurance Pricing Course</title>
+<style>
+:root{--p:#1a5276;--a:#2980b9;--g:#27ae60;--r:#e74c3c;--o:#f39c12;--bg:#f4f6f9;--c:#fff;--t:#2c3e50;--lt:#7f8c8d;--bd:#dee2e6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t);line-height:1.75;font-size:17px}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 35px}
+.hero{background:linear-gradient(135deg,#0b3d5b 0%,#1a5276 30%,#2980b9 70%,#1abc9c 100%);color:#fff;padding:50px 30px;text-align:center}
+.hero h1{font-size:2.5em;margin-bottom:8px;text-shadow:2px 2px 6px rgba(0,0,0,.4)}
+.hero .sub{opacity:.85;font-size:1.1em;max-width:700px;margin:0 auto}
+.hero .parttag{display:inline-block;background:rgba(255,255,255,.2);padding:6px 22px;border-radius:20px;margin-top:15px;font-weight:700}
+nav.breadcrumb{background:#fff;padding:12px 35px;font-size:.9em;border-bottom:1px solid var(--bd)}
+nav.breadcrumb a{color:var(--a);text-decoration:none} nav.breadcrumb a:hover{text-decoration:underline}
+.ch{background:var(--c);border-radius:14px;padding:40px 45px;margin:30px 0;box-shadow:0 2px 15px rgba(0,0,0,.06);border-left:6px solid var(--a);position:relative}
+.ch h2{color:var(--p);font-size:1.8em;margin-bottom:5px;padding-bottom:12px;border-bottom:2px solid #eee}
+.ch h3{color:var(--a);margin:28px 0 12px;font-size:1.35em}
+.ch h4{color:#34495e;margin:22px 0 10px;font-size:1.1em}
+.ch p,.ch li{margin:8px 0}.ch ul,.ch ol{padding-left:25px}
+.box{border-radius:10px;padding:18px 22px;margin:18px 0;border-left:5px solid}
+.eli5{background:#fef9e7;border-color:#f1c40f}.eli5::before{content:"🧒 Like You're 5: ";font-weight:700}
+.key{background:#eaf2f8;border-color:var(--a)}.key::before{content:"🔑 Key Insight: ";font-weight:700}
+.form{background:#f4ecf7;border-color:#8e44ad}.form::before{content:"📐 Formula: ";font-weight:700;font-family:'Segoe UI',sans-serif}
+.warn{background:#fdedec;border-color:var(--r)}.warn::before{content:"⚠️ Watch Out: ";font-weight:700}
+.ok{background:#eafaf1;border-color:var(--g)}.ok::before{content:"✅ ";font-weight:700}
+.think{background:#fdf2e9;border-color:#e67e22}.think::before{content:"🤔 Think About It: ";font-weight:700}
+.real{background:#e8f6f3;border-color:#16a085}.real::before{content:"🏢 Real World: ";font-weight:700}
+table{width:100%;border-collapse:collapse;margin:15px 0;font-size:.95em}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--bd)}
+th{background:var(--p);color:#fff;font-weight:600}
+tr:nth-child(even){background:#f8f9fa}tr:hover{background:#eaf2f8}
+.diagram{display:flex;align-items:center;justify-content:center;gap:12px;margin:25px 0;flex-wrap:wrap}
+.dbox{padding:16px 22px;border-radius:12px;text-align:center;font-weight:600;min-width:120px;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+.darr{font-size:2em;color:var(--lt)}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}
+.ccard{border-radius:12px;padding:20px;border:2px solid}.ccard h4{margin-top:0}
+.ccard.good{border-color:var(--g);background:#f0faf3}
+.ccard.bad{border-color:var(--r);background:#fdf0ef}
+pre{background:#2c3e50;color:#ecf0f1;padding:18px 22px;border-radius:10px;overflow-x:auto;margin:15px 0;line-height:1.5;font-size:.88em}
+pre code{background:none;padding:0;color:inherit}
+code{background:#ecf0f1;padding:2px 6px;border-radius:4px;font-family:'Cascadia Code','Consolas',monospace;font-size:.9em}
+.highlight{background:linear-gradient(120deg,#ffeaa7 0%,#fdcb6e 100%);padding:2px 5px;border-radius:3px}
+.svg-chart{margin:20px auto;display:block}
+[id]{scroll-margin-top:20px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin:20px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}
+.gcard{border:2px solid var(--bd);border-radius:12px;padding:20px;text-align:center}
+.gcard .icon{font-size:2.5em;margin:8px 0}
+.gcard h4{margin:8px 0 5px}
+.step-list{counter-reset:steps}
+.step-list li{counter-increment:steps;list-style:none;padding:12px 15px 12px 55px;margin:8px 0;background:#fff;border-radius:8px;border:1px solid #eee;position:relative}
+.step-list li::before{content:counter(steps);position:absolute;left:12px;top:12px;background:var(--a);color:#fff;width:30px;height:30px;border-radius:50%;text-align:center;line-height:30px;font-weight:700;font-size:.9em}
+.flow{display:flex;align-items:stretch;gap:0;margin:22px 0;flex-wrap:wrap;justify-content:center}
+.fstep{padding:14px 18px;text-align:center;border-radius:10px;min-width:120px;font-size:.9em;display:flex;flex-direction:column;justify-content:center}
+.fstep strong{display:block;margin-bottom:3px}
+.farr{display:flex;align-items:center;font-size:1.5em;color:#bdc3c7;padding:0 5px}
+.bar-chart{margin:20px 0}.bar-row{display:flex;align-items:center;margin:6px 0}
+.bar-label{width:160px;font-size:.9em;text-align:right;padding-right:10px}
+.bar-track{flex:1;background:#ecf0f1;border-radius:6px;height:30px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;color:#fff;font-size:.82em;font-weight:600}
+.nav-footer{display:flex;justify-content:space-between;padding:30px 0;margin-top:30px;border-top:2px solid var(--bd)}
+.nav-footer a{color:var(--a);text-decoration:none;font-weight:600;font-size:1.1em}
+.nav-footer a:hover{text-decoration:underline}
+@media print{.ch{break-inside:avoid}}
+@media(max-width:768px){.grid3{grid-template-columns:1fr}.compare,.grid2{grid-template-columns:1fr}.ch{padding:25px 20px}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Insurance Pricing Modelling</h1>
+  <div class="sub">GAMs, Splines, Model Validation, Cross-Validation & Regularization</div>
+  <div class="parttag">PART 4 of 5: GAM & ADVANCED TOPICS</div>
+</div>
+
+<nav class="breadcrumb">
+  <a href="index.html">🏠 Course Home</a> &gt;
+  <a href="Part3_GLM.html">Part 3: GLM</a> &gt;
+  <strong>Part 4: GAM & Advanced</strong> &gt; Chapters 23–32
+</nav>
+
+<div class="wrap">
+
+<!-- ═══════════════════ CHAPTER 23 ═══════════════════ -->
+<div class="ch" id="ch23">
+<h2>Chapter 23: GAM — Why Straight Lines Aren't Enough</h2>
+
+<div class="box eli5">
+A GLM draws a straight line (on the log scale). But real life isn't always straight. The relationship between company size and claims might curve — small companies have very few claims, medium ones have many, and very large ones level off. A GAM is like replacing the ruler with a <strong>flexible snake ruler</strong> that can bend to follow the data.
+</div>
+
+<h3>GLM vs GAM — The Core Difference</h3>
+<div class="box form">
+<strong>GLM:</strong> log(E[Y]) = β₀ + <span class="highlight">β₁ × X</span> → Straight line<br><br>
+<strong>GAM:</strong> log(E[Y]) = β₀ + <span class="highlight">f(X)</span> → Smooth curve<br><br>
+That <strong>f(X)</strong> is a <strong>smooth function</strong> that the data determines. The model learns the shape.
+</div>
+
+<svg class="svg-chart" width="700" height="220" viewBox="0 0 700 220">
+  <text x="350" y="15" text-anchor="middle" font-weight="bold" font-size="13" fill="#2c3e50">GLM (Straight Line) vs GAM (Smooth Curve) on Your Data</text>
+  
+  <line x1="60" y1="25" x2="60" y2="195" stroke="#bdc3c7" stroke-width="1"/>
+  <line x1="60" y1="195" x2="660" y2="195" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="30" y="110" text-anchor="middle" font-size="9" fill="#7f8c8d" transform="rotate(-90 30 110)">Log(Claims)</text>
+  <text x="360" y="212" text-anchor="middle" font-size="9" fill="#7f8c8d">Log₁₀(Exposure) →</text>
+  
+  <!-- Data points -->
+  <circle cx="90" cy="185" r="7" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="140" cy="178" r="8" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="190" cy="165" r="10" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="250" cy="140" r="12" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="310" cy="110" r="13" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="370" cy="80" r="12" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="430" cy="60" r="10" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="490" cy="55" r="8" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="550" cy="60" r="7" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="610" cy="70" r="6" fill="#2c3e50" opacity="0.4"/>
+  
+  <!-- GLM: straight -->
+  <line x1="80" y1="190" x2="640" y2="40" stroke="#27ae60" stroke-width="3" stroke-dasharray="8"/>
+  <text x="640" y="32" font-size="11" fill="#27ae60" font-weight="bold">GLM</text>
+  
+  <!-- GAM: curved -->
+  <path d="M80,188 Q180,170 250,140 Q350,85 430,55 Q500,50 570,58 Q620,68 640,75" fill="none" stroke="#2980b9" stroke-width="3.5"/>
+  <text x="640" y="82" font-size="11" fill="#2980b9" font-weight="bold">GAM</text>
+  
+  <!-- Annotations -->
+  <text x="150" y="155" font-size="10" fill="#e74c3c">GLM overshoots ↗</text>
+  <text x="520" y="40" font-size="10" fill="#e74c3c">GLM undershoots ↘</text>
+  <text x="350" y="35" font-size="11" fill="#2980b9" font-weight="bold">GAM follows the data!</text>
+</svg>
+
+<h3>Key Terminology</h3>
+<table>
+  <tr><th>Term</th><th>Meaning</th><th>Your Model</th></tr>
+  <tr><td><strong>f(X)</strong></td><td>The smooth function — a flexible curve learned from data</td><td>f(log₁₀Exposure)</td></tr>
+  <tr><td><strong>Spline</strong></td><td>The mathematical tool used to create f(X) — piecewise polynomials joined smoothly</td><td>Thin-plate regression spline</td></tr>
+  <tr><td><strong>Knots</strong></td><td>The "anchor points" where the spline pieces connect</td><td>k = 5 knots</td></tr>
+  <tr><td><strong>Basis functions</strong></td><td>The building blocks: B₁(x), B₂(x), ... Each is a simple curve</td><td>7 basis functions</td></tr>
+  <tr><td><strong>EDF</strong></td><td>Effective degrees of freedom — how "wiggly" the smooth actually is</td><td>edf ≈ 3.5</td></tr>
+  <tr><td><strong>Smoothing parameter (λ)</strong></td><td>Controls how much bending is allowed. Higher = smoother.</td><td>Estimated by REML</td></tr>
+</table>
+</div>
+
+<!-- ═══════════════════ CHAPTER 24 ═══════════════════ -->
+<div class="ch" id="ch24">
+<h2>Chapter 24: How Splines Work — Step by Step</h2>
+
+<div class="box eli5">
+Imagine 5 friends (the "basis functions") standing along a number line. Each friend holds a different bell-shaped bump at their position. The model decides how much weight to give each friend's bump. Add all the weighted bumps together → you get a smooth curve. More weight on friend #3 → bigger bump in the middle. Negative weight on friend #5 → a dip at the end.
+</div>
+
+<h3>Step 1: Create Basis Functions</h3>
+<div class="box form">
+A spline with k knots generates (approximately k) basis functions B₁(x), B₂(x), ..., B_k(x).<br>
+Each Bᵢ(x) is a smooth curve that's "active" in a local region of x.
+</div>
+
+<svg class="svg-chart" width="700" height="200" viewBox="0 0 700 200">
+  <text x="350" y="15" text-anchor="middle" font-weight="bold" font-size="12" fill="#2c3e50">Step 1: Individual Basis Functions (k=5)</text>
+  <line x1="40" y1="180" x2="660" y2="180" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="350" y="198" text-anchor="middle" font-size="9" fill="#7f8c8d">log₁₀(Exposure) →</text>
+  
+  <!-- 7 basis functions -->
+  <path d="M50,175 Q80,170 100,80 Q120,170 180,175" fill="none" stroke="#e74c3c" stroke-width="2.5"/>
+  <text x="100" y="70" text-anchor="middle" font-size="10" fill="#e74c3c" font-weight="bold">B₁</text>
+  
+  <path d="M100,175 Q140,168 170,90 Q200,168 260,175" fill="none" stroke="#f39c12" stroke-width="2.5"/>
+  <text x="170" y="80" text-anchor="middle" font-size="10" fill="#f39c12" font-weight="bold">B₂</text>
+  
+  <path d="M190,175 Q240,165 280,70 Q320,165 370,175" fill="none" stroke="#27ae60" stroke-width="2.5"/>
+  <text x="280" y="60" text-anchor="middle" font-size="10" fill="#27ae60" font-weight="bold">B₃</text>
+  
+  <path d="M300,175 Q350,165 390,85 Q430,165 480,175" fill="none" stroke="#2980b9" stroke-width="2.5"/>
+  <text x="390" y="75" text-anchor="middle" font-size="10" fill="#2980b9" font-weight="bold">B₄</text>
+  
+  <path d="M410,175 Q460,165 500,95 Q540,165 590,175" fill="none" stroke="#8e44ad" stroke-width="2.5"/>
+  <text x="500" y="85" text-anchor="middle" font-size="10" fill="#8e44ad" font-weight="bold">B₅</text>
+  
+  <path d="M510,175 Q550,165 590,75 Q630,165 660,175" fill="none" stroke="#16a085" stroke-width="2.5"/>
+  <text x="590" y="65" text-anchor="middle" font-size="10" fill="#16a085" font-weight="bold">B₆</text>
+  
+  <path d="M580,175 Q620,168 645,100 Q660,155 660,175" fill="none" stroke="#c0392b" stroke-width="2.5"/>
+  <text x="645" y="90" text-anchor="middle" font-size="10" fill="#c0392b" font-weight="bold">B₇</text>
+</svg>
+
+<h3>Step 2: The Model Learns Weights</h3>
+<div class="box form">
+f(x) = γ₁B₁(x) + γ₂B₂(x) + γ₃B₃(x) + γ₄B₄(x) + γ₅B₅(x) + γ₆B₆(x) + γ₇B₇(x)<br><br>
+The model estimates the weights γ₁, γ₂, ..., γ₇ using maximum likelihood.
+</div>
+
+<h3>Step 3: Add Weighted Basis Functions → Smooth Curve</h3>
+
+<svg class="svg-chart" width="700" height="200" viewBox="0 0 700 200">
+  <text x="350" y="15" text-anchor="middle" font-weight="bold" font-size="12" fill="#2c3e50">Step 3: Weighted Sum = The Smooth Curve f(x)</text>
+  <line x1="40" y1="180" x2="660" y2="180" stroke="#bdc3c7" stroke-width="1"/>
+  
+  <!-- Individual weighted (faded) -->
+  <path d="M50,170 Q80,168 100,155 Q120,168 180,170" fill="none" stroke="#e74c3c" stroke-width="1" opacity="0.3"/>
+  <path d="M100,170 Q140,165 170,140 Q200,165 260,170" fill="none" stroke="#f39c12" stroke-width="1" opacity="0.3"/>
+  <path d="M190,170 Q240,155 280,100 Q320,155 370,170" fill="none" stroke="#27ae60" stroke-width="1" opacity="0.3"/>
+  <path d="M300,170 Q350,150 390,110 Q430,150 480,170" fill="none" stroke="#2980b9" stroke-width="1" opacity="0.3"/>
+  
+  <!-- Combined smooth (bold) -->
+  <path d="M60,172 Q120,168 180,155 Q250,125 320,90 Q390,65 450,55 Q520,58 580,70 Q630,85 660,100" fill="none" stroke="#8e44ad" stroke-width="4"/>
+  <text x="450" y="45" font-size="12" fill="#8e44ad" font-weight="bold">f(x) = the smooth!</text>
+  
+  <!-- Data points -->
+  <circle cx="90" cy="170" r="5" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="180" cy="158" r="6" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="270" cy="120" r="7" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="360" cy="80" r="7" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="450" cy="58" r="6" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="540" cy="62" r="5" fill="#2c3e50" opacity="0.4"/>
+  <circle cx="630" cy="92" r="4" fill="#2c3e50" opacity="0.4"/>
+</svg>
+
+<div class="box key">
+<strong>The complete GAM is:</strong><br>
+log(E[Claims]) = β₀ + γ₁B₁(x) + γ₂B₂(x) + ... + γ₇B₇(x) + β_UK × is_UK + ... + offset<br><br>
+The smooth part handles the continuous variable (exposure). The regular β coefficients handle the categorical variables (country, trade, binder). It's GLM + smooth = GAM.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 25 ═══════════════════ -->
+<div class="ch" id="ch25">
+<h2>Chapter 25: Smoothing Parameters & Penalization</h2>
+
+<div class="box eli5">
+Without any control, the spline could wiggle so much it passes through every data point — like connecting the dots with a crazy scribble. That's overfitting. The <strong>smoothing parameter λ</strong> acts like a "calm down" knob: higher λ = smoother (less wiggly) curve, lower λ = more flexible (more wiggly).
+</div>
+
+<h3>The Penalized Likelihood</h3>
+<div class="box form">
+GAM maximizes: <strong>Log-likelihood − λ × ∫ [f''(x)]² dx</strong><br><br>
+• First part: fit the data well (high log-likelihood)<br>
+• Second part: penalty for "wiggliness" (integrated squared second derivative)<br>
+• λ balances the two: big λ → smooth, small λ → flexible
+</div>
+
+<h3>The k Parameter vs The Smoothing Parameter</h3>
+<table>
+  <tr><th></th><th>k (knots)</th><th>λ (smoothing parameter)</th></tr>
+  <tr><td><strong>What it controls</strong></td><td>MAXIMUM flexibility</td><td>ACTUAL flexibility used</td></tr>
+  <tr><td><strong>Set by</strong></td><td>You (the modeller)</td><td>The algorithm (REML/GCV)</td></tr>
+  <tr><td><strong>Analogy</strong></td><td>Size of the paint palette</td><td>How many colors you actually use</td></tr>
+  <tr><td><strong>If too small</strong></td><td>Can't capture the true shape</td><td>Too smooth (underfitting)</td></tr>
+  <tr><td><strong>If too large</strong></td><td>Wastes computation</td><td>Too wiggly (overfitting)</td></tr>
+  <tr><td><strong>Your model</strong></td><td>k = 5</td><td>Automatically estimated</td></tr>
+</table>
+
+<div class="box eli5">
+Think of k as the number of crayons you're allowed to have. λ is how carefully you color. With k=5 crayons, you can draw a moderately detailed picture. With k=20, you could draw very fine detail — but λ will stop you from over-coloring.
+</div>
+
+<h3>Effective Degrees of Freedom (EDF)</h3>
+<div class="box form">
+EDF tells you how many "effective parameters" the smooth uses:<br>
+• EDF = 1 → the smooth is essentially a straight line (GLM equivalent)<br>
+• EDF = 2 → gentle curve<br>
+• EDF = 3.5 → moderate curve (YOUR model)<br>
+• EDF = k-1 → maximum wiggliness allowed<br><br>
+If EDF ≈ 1, you don't need a GAM — a GLM would suffice.
+</div>
+
+<h3>How to Choose k</h3>
+<div class="bar-chart">
+  <div class="bar-row">
+    <div class="bar-label"><strong>k = 3</strong> (minimal)</div>
+    <div class="bar-track"><div class="bar-fill" style="width:20%;background:#27ae60;">Almost linear</div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label"><strong>k = 5 (default) ⭐</strong></div>
+    <div class="bar-track"><div class="bar-fill" style="width:40%;background:#2980b9;">Good balance for most insurance data</div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label"><strong>k = 10</strong></div>
+    <div class="bar-track"><div class="bar-fill" style="width:65%;background:#f39c12;">Use for lots of data + complex relationship</div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label"><strong>k = 20</strong></div>
+    <div class="bar-track"><div class="bar-fill" style="width:90%;background:#e74c3c;">Usually overkill — overfitting risk</div></div>
+  </div>
+</div>
+
+<pre><code># R: Check if k is big enough
+gam.check(model)
+# Look at: k' (k used) vs edf (effective df)
+# If edf is close to k-1, you might need larger k
+# If edf is much smaller than k-1, k is fine</code></pre>
+
+<div class="box key">
+<strong>Rule of thumb:</strong> Start with k=5 or k=10. Run <code>gam.check()</code>. If edf ≈ k-1, increase k. If edf << k-1, your k is fine. For your construction model with k=5 and edf ≈ 3.5, it's working well.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 26 ═══════════════════ -->
+<div class="ch" id="ch26">
+<h2>Chapter 26: One-Way Analysis & Partial Dependence Plots</h2>
+
+<div class="box eli5">
+A one-way plot is like a science experiment: change ONE thing (like exposure), keep everything else the same (country, trade, etc.), and see what happens to the prediction. It shows the model's "opinion" on how each variable affects the price.
+</div>
+
+<h3>What Is a One-Way Plot?</h3>
+<p>For each variable, plot the model's predicted value as that variable changes, holding all other variables at their average/reference values.</p>
+
+<svg class="svg-chart" width="700" height="250" viewBox="0 0 700 250">
+  <text x="350" y="15" text-anchor="middle" font-weight="bold" font-size="13" fill="#2c3e50">One-Way Plot: Predicted Rate vs Exposure</text>
+  
+  <line x1="60" y1="25" x2="60" y2="210" stroke="#bdc3c7" stroke-width="1"/>
+  <line x1="60" y1="210" x2="650" y2="210" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="30" y="120" text-anchor="middle" font-size="9" fill="#7f8c8d" transform="rotate(-90 30 120)">Rate on Exposure (%)</text>
+  <text x="360" y="230" text-anchor="middle" font-size="9" fill="#7f8c8d">Exposure ($M, log scale) →</text>
+  
+  <!-- Exposure labels -->
+  <text x="100" y="225" text-anchor="middle" font-size="9" fill="#7f8c8d">$0.1M</text>
+  <text x="220" y="225" text-anchor="middle" font-size="9" fill="#7f8c8d">$1M</text>
+  <text x="340" y="225" text-anchor="middle" font-size="9" fill="#7f8c8d">$10M</text>
+  <text x="460" y="225" text-anchor="middle" font-size="9" fill="#7f8c8d">$100M</text>
+  <text x="580" y="225" text-anchor="middle" font-size="9" fill="#7f8c8d">$1B</text>
+  
+  <!-- Actual data -->
+  <circle cx="100" cy="60" r="7" fill="#2c3e50" opacity="0.5"/>
+  <circle cx="160" cy="80" r="9" fill="#2c3e50" opacity="0.5"/>
+  <circle cx="220" cy="100" r="11" fill="#2c3e50" opacity="0.5"/>
+  <circle cx="280" cy="115" r="12" fill="#2c3e50" opacity="0.5"/>
+  <circle cx="340" cy="130" r="12" fill="#2c3e50" opacity="0.5"/>
+  <circle cx="400" cy="150" r="10" fill="#2c3e50" opacity="0.5"/>
+  <circle cx="460" cy="160" r="8" fill="#2c3e50" opacity="0.5"/>
+  <circle cx="520" cy="168" r="6" fill="#2c3e50" opacity="0.5"/>
+  <circle cx="580" cy="172" r="5" fill="#2c3e50" opacity="0.5"/>
+  
+  <!-- GLM prediction -->
+  <line x1="80" y1="45" x2="620" y2="185" stroke="#27ae60" stroke-width="2.5" stroke-dasharray="8"/>
+  <text x="640" y="185" font-size="10" fill="#27ae60" font-weight="bold">GLM</text>
+  
+  <!-- GAM prediction -->
+  <path d="M80,55 Q160,78 240,105 Q340,135 420,152 Q500,162 580,170 Q610,172 620,173" fill="none" stroke="#2980b9" stroke-width="3"/>
+  <text x="640" y="170" font-size="10" fill="#2980b9" font-weight="bold">GAM</text>
+  
+  <!-- Confidence band (shaded) -->
+  <path d="M80,45 Q160,65 240,90 Q340,120 420,140 Q500,148 580,155 Q610,157 620,158 L620,188 Q580,185 500,178 Q420,168 340,150 Q240,120 160,92 Q80,68 80,68 Z" fill="#2980b9" fill-opacity="0.1"/>
+  
+  <!-- Annotation -->
+  <rect x="350" y="35" width="270" height="50" rx="8" fill="#fff" stroke="#bdc3c7"/>
+  <text x="485" y="52" text-anchor="middle" font-size="10" fill="#2c3e50" font-weight="bold">Rate DECREASES with exposure</text>
+  <text x="485" y="68" text-anchor="middle" font-size="9" fill="#7f8c8d">(Big companies have lower rate but higher $ claims)</text>
+  <text x="485" y="80" text-anchor="middle" font-size="9" fill="#2980b9">GAM captures the non-linear flattening</text>
+</svg>
+
+<h3>How to Create One-Way Plots</h3>
+<pre><code># R: Plot smooth terms from GAM
+plot(gam_model, pages=1, shade=TRUE, shade.col="lightblue")
+
+# Or for full one-way plots:
+library(mgcv)
+vis.gam(gam_model, view="log10TradeExposureUSD_Inflated",
+        type="response", plot.type="persp")
+
+# Python:
+from pygam import LinearGAM
+gam.partial_dependence(term=0)  # First smooth term</code></pre>
+
+<h3>What to Look For in One-Way Plots</h3>
+<table>
+  <tr><th>Observation</th><th>What It Means</th><th>Action</th></tr>
+  <tr><td>Model line through data points</td><td>Good fit ✅</td><td>Keep the variable</td></tr>
+  <tr><td>Data curves, model straight</td><td>Need a smooth (GAM) for this variable</td><td>Add s() term</td></tr>
+  <tr><td>Wide confidence bands</td><td>Not enough data in that region</td><td>Consider grouping/capping</td></tr>
+  <tr><td>Counter-intuitive direction</td><td>Possible collinearity or data issue</td><td>Investigate the raw data</td></tr>
+</table>
+</div>
+
+<!-- ═══════════════════ CHAPTER 27 ═══════════════════ -->
+<div class="ch" id="ch27">
+<h2>Chapter 27: Cross-Validation — The Honest Test</h2>
+
+<div class="box eli5">
+Cross-validation is like a student who studies from Chapter 1-19 of the textbook and then takes a test on Chapter 20. If they do well, they truly learned the material (not just memorized). We train the model on most of the data and test it on the held-out portion. Repeat multiple times for reliability.
+</div>
+
+<h3>K-Fold Cross-Validation — Step by Step</h3>
+
+<svg class="svg-chart" width="700" height="280" viewBox="0 0 700 280">
+  <text x="350" y="18" text-anchor="middle" font-weight="bold" font-size="13" fill="#2c3e50">5-Fold Cross-Validation (Yours uses 20-fold)</text>
+  
+  <!-- Fold 1 -->
+  <text x="30" y="58" font-size="11" fill="#2c3e50" font-weight="bold">Fold 1:</text>
+  <rect x="90" y="42" width="100" height="25" rx="4" fill="#e74c3c" fill-opacity="0.7"/>
+  <text x="140" y="59" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold">TEST</text>
+  <rect x="195" y="42" width="100" height="25" rx="4" fill="#2980b9" fill-opacity="0.5"/>
+  <rect x="300" y="42" width="100" height="25" rx="4" fill="#2980b9" fill-opacity="0.5"/>
+  <rect x="405" y="42" width="100" height="25" rx="4" fill="#2980b9" fill-opacity="0.5"/>
+  <rect x="510" y="42" width="100" height="25" rx="4" fill="#2980b9" fill-opacity="0.5"/>
+  <text x="355" y="59" text-anchor="middle" font-size="10" fill="#fff">TRAIN</text>
+  <text x="630" y="59" font-size="10" fill="#27ae60" font-weight="bold">→ Gini₁, AIC₁</text>
+  
+  <!-- Fold 2 -->
+  <text x="30" y="98" font-size="11" fill="#2c3e50" font-weight="bold">Fold 2:</text>
+  <rect x="90" y="82" width="100" height="25" rx="4" fill="#2980b9" fill-opacity="0.5"/>
+  <rect x="195" y="82" width="100" height="25" rx="4" fill="#e74c3c" fill-opacity="0.7"/>
+  <text x="245" y="99" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold">TEST</text>
+  <rect x="300" y="82" width="100" height="25" rx="4" fill="#2980b9" fill-opacity="0.5"/>
+  <rect x="405" y="82" width="100" height="25" rx="4" fill="#2980b9" fill-opacity="0.5"/>
+  <rect x="510" y="82" width="100" height="25" rx="4" fill="#2980b9" fill-opacity="0.5"/>
+  <text x="630" y="99" font-size="10" fill="#27ae60" font-weight="bold">→ Gini₂, AIC₂</text>
+  
+  <!-- Fold 3 -->
+  <text x="30" y="138" font-size="11" fill="#2c3e50" font-weight="bold">Fold 3:</text>
+  <rect x="90" y="122" width="100" height="25" rx="4" fill="#2980b9" fill-opacity="0.5"/>
+  <rect x="195" y="122" width="100" height="25" rx="4" fill="#2980b9" fill-opacity="0.5"/>
+  <rect x="300" y="122" width="100" height="25" rx="4" fill="#e74c3c" fill-opacity="0.7"/>
+  <text x="350" y="139" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold">TEST</text>
+  <rect x="405" y="122" width="100" height="25" rx="4" fill="#2980b9" fill-opacity="0.5"/>
+  <rect x="510" y="122" width="100" height="25" rx="4" fill="#2980b9" fill-opacity="0.5"/>
+  <text x="630" y="139" font-size="10" fill="#27ae60" font-weight="bold">→ Gini₃, AIC₃</text>
+  
+  <!-- Dots for 4,5 -->
+  <text x="350" y="175" text-anchor="middle" font-size="14" fill="#7f8c8d">... (repeat for folds 4, 5) ...</text>
+  
+  <!-- Final -->
+  <rect x="150" y="200" width="400" height="60" rx="10" fill="#d5f5e3" stroke="#27ae60" stroke-width="2"/>
+  <text x="350" y="225" text-anchor="middle" font-weight="bold" font-size="13" fill="#1e8449">Final Metric = Average across all folds</text>
+  <text x="350" y="248" text-anchor="middle" font-size="11" fill="#2c3e50">Gini_CV = (Gini₁ + Gini₂ + ... + Gini₅) / 5</text>
+</svg>
+
+<h3>Your 20-Fold CV Process</h3>
+<pre><code># Pseudocode (what your cross_validate_model() does):
+for formula in [formula1, formula2, ..., formula20]:
+    for fold in 1:20:
+        train = data[-fold]  # 19/20 of data
+        test  = data[fold]   # 1/20 held out
+        
+        model = bam(formula, data=train, family=tw(1.5))
+        predictions = predict(model, newdata=test)
+        
+        gini[fold]     = compute_gini(test$actual, predictions)
+        deviance[fold] = compute_deviance(test$actual, predictions)
+        rmse[fold]     = sqrt(mean((test$actual - predictions)^2))
+    
+    avg_gini[formula] = mean(gini)
+    avg_rmse[formula] = mean(rmse)
+
+best_formula = formula with highest avg_gini and lowest avg_rmse</code></pre>
+
+<h3>CV Metrics for Model Comparison</h3>
+<table>
+  <tr><th>Metric</th><th>What It Measures</th><th>Better =</th><th>Typical Range</th></tr>
+  <tr><td><strong>Gini</strong></td><td>Can the model rank risks correctly?</td><td>Higher</td><td>0.20–0.50 for insurance</td></tr>
+  <tr><td><strong>AIC</strong></td><td>Fit vs complexity trade-off</td><td>Lower</td><td>Relative (compare models)</td></tr>
+  <tr><td><strong>Deviance</strong></td><td>How well predictions match reality</td><td>Lower</td><td>Relative</td></tr>
+  <tr><td><strong>RMSE</strong></td><td>Average prediction error in dollars</td><td>Lower</td><td>Depends on data scale</td></tr>
+</table>
+</div>
+
+<!-- ═══════════════════ CHAPTER 28 ═══════════════════ -->
+<div class="ch" id="ch28">
+<h2>Chapter 28: Lorenz Curves & The Gini Coefficient</h2>
+
+<div class="box eli5">
+Imagine sorting all your policies from "model thinks this is safest" to "model thinks this is riskiest." Then check: do the "risky" policies actually have more claims? The Lorenz curve shows this visually. If the model is perfect, 10% of the riskiest policies would account for way more than 10% of total claims.
+</div>
+
+<h3>How to Build a Lorenz Curve</h3>
+<ol class="step-list">
+  <li>Sort all policies by the model's predicted risk (lowest → highest)</li>
+  <li>Compute cumulative % of policies (x-axis)</li>
+  <li>Compute cumulative % of actual claims (y-axis)</li>
+  <li>Plot it — compare to the 45° "random model" line</li>
+</ol>
+
+<svg class="svg-chart" width="500" height="350" viewBox="0 0 500 350">
+  <text x="250" y="18" text-anchor="middle" font-weight="bold" font-size="13" fill="#2c3e50">Lorenz Curve — Model Discrimination</text>
+  
+  <line x1="60" y1="30" x2="60" y2="300" stroke="#bdc3c7" stroke-width="1"/>
+  <line x1="60" y1="300" x2="460" y2="300" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="30" y="165" text-anchor="middle" font-size="10" fill="#7f8c8d" transform="rotate(-90 30 165)">Cumulative % of Actual Claims</text>
+  <text x="260" y="325" text-anchor="middle" font-size="10" fill="#7f8c8d">Cumulative % of Policies (sorted by predicted risk) →</text>
+  
+  <!-- Axis labels -->
+  <text x="60" y="315" font-size="9" fill="#7f8c8d">0%</text>
+  <text x="260" y="315" font-size="9" fill="#7f8c8d">50%</text>
+  <text x="455" y="315" font-size="9" fill="#7f8c8d">100%</text>
+  <text x="45" y="305" font-size="9" fill="#7f8c8d">0%</text>
+  <text x="40" y="170" font-size="9" fill="#7f8c8d">50%</text>
+  <text x="35" y="40" font-size="9" fill="#7f8c8d">100%</text>
+  
+  <!-- 45° line (random model) -->
+  <line x1="60" y1="300" x2="460" y2="30" stroke="#bdc3c7" stroke-width="2" stroke-dasharray="6"/>
+  <text x="280" y="148" font-size="10" fill="#bdc3c7" font-weight="bold" transform="rotate(-34 280 148)">Random Model (Gini=0)</text>
+  
+  <!-- Good model curve -->
+  <path d="M60,300 Q100,298 160,290 Q250,265 320,215 Q380,140 420,70 Q445,40 460,30" fill="none" stroke="#2980b9" stroke-width="3"/>
+  <text x="200" y="265" font-size="11" fill="#2980b9" font-weight="bold">Your Model (Gini≈0.35)</text>
+  
+  <!-- Perfect model -->
+  <path d="M60,300 L60,30 L460,30" fill="none" stroke="#27ae60" stroke-width="2" stroke-dasharray="4"/>
+  <text x="120" y="28" font-size="10" fill="#27ae60" font-weight="bold">Perfect (Gini=1)</text>
+  
+  <!-- Shaded Gini area -->
+  <path d="M60,300 Q100,298 160,290 Q250,265 320,215 Q380,140 420,70 Q445,40 460,30 L60,300 Z" fill="#2980b9" fill-opacity="0.1"/>
+  <text x="250" y="215" font-size="10" fill="#2980b9">← Gini = 2 × this area</text>
+</svg>
+
+<div class="box form">
+<strong>Gini Coefficient</strong> = 2 × (Area between your model's curve and the 45° line)<br><br>
+Gini = 0 → Model is random (useless)<br>
+Gini = 0.3 → Decent discrimination (typical for insurance)<br>
+Gini = 0.5 → Very good<br>
+Gini = 1.0 → Perfect (impossible in practice)
+</div>
+
+<div class="box key">
+A Gini improvement of 0.02–0.05 is meaningful in insurance pricing. If your GAM has Gini = 0.37 vs GLM's 0.35, that's a real improvement worth deploying.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 29 ═══════════════════ -->
+<div class="ch" id="ch29">
+<h2>Chapter 29: Lift Charts & Decile Analysis</h2>
+
+<div class="box eli5">
+Divide your policies into 10 equal groups (deciles) from lowest predicted risk to highest. Then check: does the actual loss rate increase across deciles? If decile 10 (highest predicted risk) has 5× the actual losses of decile 1 (lowest predicted risk), the model has good "lift."
+</div>
+
+<h3>How to Read a Lift Chart</h3>
+
+<svg class="svg-chart" width="650" height="250" viewBox="0 0 650 250">
+  <text x="325" y="18" text-anchor="middle" font-weight="bold" font-size="13" fill="#2c3e50">Lift Chart: Actual Loss Rate by Predicted Risk Decile</text>
+  
+  <line x1="60" y1="30" x2="60" y2="210" stroke="#bdc3c7" stroke-width="1"/>
+  <line x1="60" y1="210" x2="620" y2="210" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="340" y="240" text-anchor="middle" font-size="10" fill="#7f8c8d">Decile (1=safest predicted → 10=riskiest predicted)</text>
+  <text x="30" y="120" text-anchor="middle" font-size="9" fill="#7f8c8d" transform="rotate(-90 30 120)">Actual Loss Rate</text>
+  
+  <!-- Bars -->
+  <rect x="75" y="195" width="45" height="15" fill="#27ae60" rx="2"/>
+  <text x="98" y="208" text-anchor="middle" font-size="8" fill="#fff">1</text>
+  
+  <rect x="130" y="185" width="45" height="25" fill="#2ecc71" rx="2"/>
+  <text x="153" y="202" text-anchor="middle" font-size="8" fill="#fff">2</text>
+  
+  <rect x="185" y="175" width="45" height="35" fill="#f1c40f" rx="2"/>
+  <text x="208" y="196" text-anchor="middle" font-size="8" fill="#fff">3</text>
+  
+  <rect x="240" y="163" width="45" height="47" fill="#f1c40f" rx="2"/>
+  <text x="263" y="190" text-anchor="middle" font-size="8" fill="#fff">4</text>
+  
+  <rect x="295" y="148" width="45" height="62" fill="#f39c12" rx="2"/>
+  <text x="318" y="183" text-anchor="middle" font-size="8" fill="#fff">5</text>
+  
+  <rect x="350" y="128" width="45" height="82" fill="#e67e22" rx="2"/>
+  <text x="373" y="173" text-anchor="middle" font-size="8" fill="#fff">6</text>
+  
+  <rect x="405" y="105" width="45" height="105" fill="#e67e22" rx="2"/>
+  <text x="428" y="162" text-anchor="middle" font-size="8" fill="#fff">7</text>
+  
+  <rect x="460" y="78" width="45" height="132" fill="#e74c3c" rx="2"/>
+  <text x="483" y="150" text-anchor="middle" font-size="8" fill="#fff">8</text>
+  
+  <rect x="515" y="55" width="45" height="155" fill="#c0392b" rx="2"/>
+  <text x="538" y="140" text-anchor="middle" font-size="8" fill="#fff">9</text>
+  
+  <rect x="570" y="38" width="45" height="172" fill="#922b21" rx="2"/>
+  <text x="593" y="130" text-anchor="middle" font-size="8" fill="#fff">10</text>
+</svg>
+
+<div class="box ok">
+A good model shows a clear "staircase" pattern: actual losses increase monotonically from decile 1 to decile 10. If decile 5 has higher actual losses than decile 7, the model's ordering is wrong in that region — investigate.
+</div>
+
+<h3>A/E (Actual vs Expected) Analysis</h3>
+<div class="box form">
+<strong>A/E Ratio</strong> = Actual Claims ÷ Expected (Predicted) Claims<br><br>
+A/E = 1.00 → Perfect calibration<br>
+A/E = 1.15 → Model underprices by 15% → needs adjustment<br>
+A/E = 0.85 → Model overprices by 15% → may lose business
+</div>
+
+<p>Calculate A/E by key segments (country, trade, year) to check if the model is calibrated everywhere:</p>
+<table>
+  <tr><th>Segment</th><th>Actual</th><th>Expected</th><th>A/E</th><th>Status</th></tr>
+  <tr><td>Australia</td><td>$12.5M</td><td>$12.1M</td><td>1.03</td><td style="color:#27ae60;">✅ Good</td></tr>
+  <tr><td>United Kingdom</td><td>$8.2M</td><td>$7.0M</td><td>1.17</td><td style="color:#e74c3c;">⚠️ Underpriced</td></tr>
+  <tr><td>Canada</td><td>$3.1M</td><td>$3.5M</td><td>0.89</td><td style="color:#f39c12;">⚠️ Slightly overpriced</td></tr>
+</table>
+</div>
+
+<!-- ═══════════════════ CHAPTER 30 ═══════════════════ -->
+<div class="ch" id="ch30">
+<h2>Chapter 30: Regularization — Ridge, Lasso & Elastic Net</h2>
+
+<div class="box eli5">
+When your model has many variables, some coefficients might be too large (overfit to noise). Regularization adds a "penalty" for large coefficients — like a teacher telling students "you can only write 500 words, not 5,000." This forces the model to focus on what really matters.
+</div>
+
+<h3>The Three Types of Regularization</h3>
+
+<div class="grid3">
+  <div class="gcard" style="border-color:#2980b9;">
+    <h4>Ridge (L2)</h4>
+    <p>Penalty: λ × Σ β²</p>
+    <p>Shrinks ALL coefficients toward zero, but never exactly zero</p>
+    <p><strong>Use when:</strong> Many correlated variables, want to keep all</p>
+  </div>
+  <div class="gcard" style="border-color:#e74c3c;">
+    <h4>Lasso (L1)</h4>
+    <p>Penalty: λ × Σ |β|</p>
+    <p>Shrinks some coefficients to EXACTLY zero (automatic variable selection!)</p>
+    <p><strong>Use when:</strong> Suspect many variables are irrelevant</p>
+  </div>
+  <div class="gcard" style="border-color:#8e44ad;">
+    <h4>Elastic Net</h4>
+    <p>Penalty: α × Lasso + (1-α) × Ridge</p>
+    <p>Best of both worlds</p>
+    <p><strong>Use when:</strong> Many variables, some correlated, want selection + stability</p>
+  </div>
+</div>
+
+<div class="box form">
+<strong>Penalized Log-Likelihood:</strong><br><br>
+Ridge: ℓ(β) − λ × Σ βⱼ²<br>
+Lasso: ℓ(β) − λ × Σ |βⱼ|<br>
+Elastic Net: ℓ(β) − λ × [α × Σ |βⱼ| + (1-α) × Σ βⱼ²]
+</div>
+
+<pre><code># R: Regularized GLM with glmnet
+library(glmnet)
+fit <- glmnet(X, y, family=tweedie(var.power=1.5, link.power=0),
+              alpha=0.5)  # Elastic net (alpha=0 → ridge, alpha=1 → lasso)
+
+# Choose lambda by CV
+cv_fit <- cv.glmnet(X, y, family=tweedie(var.power=1.5, link.power=0),
+                     alpha=0.5, nfolds=20)
+best_lambda <- cv_fit$lambda.min</code></pre>
+
+<div class="box real">
+In insurance pricing, regularization is useful when:<br>
+• You have many NAICS codes or ZIP codes as variables<br>
+• You want to automatically shrink unreliable coefficients (sparse data levels)<br>
+• You're building a GBM or ML model that needs regularization to prevent overfitting<br><br>
+For your GAM with 4 variables, regularization isn't critical — the model is already parsimonious. But it becomes essential for more complex models.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 31 ═══════════════════ -->
+<div class="ch" id="ch31">
+<h2>Chapter 31: Machine Learning for Pricing — GBMs & Random Forests</h2>
+
+<div class="box eli5">
+GLM/GAM are like a recipe you write yourself — you choose the ingredients and the cooking method. Machine Learning (ML) models like GBMs are like a robot chef that figures out its own recipe from the data. The robot might cook better, but it's harder to explain what it did to the health inspector (regulator).
+</div>
+
+<h3>Gradient Boosted Machines (GBM)</h3>
+<div class="box form">
+A GBM builds hundreds of simple decision trees, each one correcting the errors of the previous ones:<br><br>
+1. Fit a simple tree → Get residuals<br>
+2. Fit a second tree to the RESIDUALS → Add it to the model<br>
+3. Fit a third tree to the NEW residuals → Add it<br>
+4. ... repeat 500–2000 times<br><br>
+Each tree is weak (shallow). But combined, they're powerful.
+</div>
+
+<h3>GLM/GAM vs ML: The Trade-offs</h3>
+<table>
+  <tr><th>Feature</th><th>GLM/GAM</th><th>GBM/Random Forest</th></tr>
+  <tr><td>Interpretability</td><td>✅ Clear coefficients & relativities</td><td>⚠️ "Black box" (need SHAP/PDP)</td></tr>
+  <tr><td>Predictive power</td><td>Good</td><td>Often better (more flexible)</td></tr>
+  <tr><td>Handles interactions</td><td>Must specify manually</td><td>Finds them automatically</td></tr>
+  <tr><td>Handles non-linearity</td><td>GAM: smooth terms needed</td><td>Naturally handles any shape</td></tr>
+  <tr><td>Regulatory acceptance</td><td>✅ Widely accepted</td><td>⚠️ Gaining acceptance slowly</td></tr>
+  <tr><td>Rating table</td><td>✅ Direct extraction</td><td>❌ Requires approximation</td></tr>
+  <tr><td>Training speed</td><td>Fast (seconds)</td><td>Slower (minutes)</td></tr>
+  <tr><td>Overfitting risk</td><td>Low (few parameters)</td><td>Higher (need tuning)</td></tr>
+</table>
+
+<div class="box key">
+<strong>Industry trend:</strong> Most insurers use GLM/GAM as the <strong>primary model</strong> (for rating tables and regulatory filings) and GBM as a <strong>benchmark</strong> to check if the GLM/GAM is missing something. If the GBM performs significantly better, the actuary investigates what interactions or non-linearities the GLM is missing.
+</div>
+
+<h3>When ML Models Beat GLM/GAM</h3>
+<ul>
+  <li><strong>Many variables:</strong> 50+ potential predictors → ML handles variable selection automatically</li>
+  <li><strong>Complex interactions:</strong> "This NAICS code is risky in the US but not in Australia" → trees find this</li>
+  <li><strong>Non-standard data:</strong> Text, images, telematics → ML can process these</li>
+</ul>
+
+<h3>When GLM/GAM Beats ML</h3>
+<ul>
+  <li><strong>Small data:</strong> 3,600 claims → ML overfits, GLM/GAM is stable</li>
+  <li><strong>Regulatory requirements:</strong> Need to explain every factor to the regulator</li>
+  <li><strong>Rating tables:</strong> Underwriters need simple multiplicative factors</li>
+  <li><strong>Business buy-in:</strong> "The UK relativity is 1.30" is clearer than "the SHAP value is 0.26"</li>
+</ul>
+</div>
+
+<!-- ═══════════════════ CHAPTER 32 ═══════════════════ -->
+<div class="ch" id="ch32">
+<h2>Chapter 32: BAM vs GAM — Scaling for Big Data</h2>
+
+<div class="box eli5">
+GAM is like a master chef cooking one plate at a time. BAM (Big Additive Model) is like an assembly line — same recipe, but optimized for cooking 10,000 plates efficiently. The food tastes the same; the kitchen just works faster.
+</div>
+
+<h3>Why BAM Exists</h3>
+<p>Standard GAM (via <code>gam()</code> in mgcv) computes a full smoothing matrix, which scales as O(n²). For n > 10,000 rows, this gets slow. BAM fixes this with:</p>
+
+<table>
+  <tr><th>Optimization</th><th>What It Does</th><th>Impact</th></tr>
+  <tr><td>Covariate discretization</td><td>Rounds predictor values to reduce unique combinations</td><td>Massive memory savings</td></tr>
+  <tr><td>Parallel processing</td><td>Splits computation across CPU cores</td><td>2-4× speed on multi-core</td></tr>
+  <tr><td>Faster REML</td><td>Uses a performance iteration instead of nested optimization</td><td>Faster convergence</td></tr>
+</table>
+
+<pre><code># R: Your code uses BAM
+library(mgcv)
+
+# GAM (slower for big data)
+model_gam <- gam(claims ~ s(log10exp, k=5) + country,
+                  family = tw(p=1.5), data = df)
+
+# BAM (same model, faster) ⭐
+model_bam <- bam(claims ~ s(log10exp, k=5) + country,
+                  family = tw(p=1.5), data = df)
+
+# Results are statistically equivalent</code></pre>
+
+<div class="box key">
+For your 35K-row dataset, BAM runs noticeably faster than GAM. The coefficients, smooth curves, and predictions are essentially identical. Always use BAM when n > 10,000.
+</div>
+</div>
+
+<!-- NAV FOOTER -->
+<div class="nav-footer">
+  <a href="Part3_GLM.html">← Part 3: GLM Deep Dive</a>
+  <span style="color:var(--lt);">Part 4 of 5: GAM & Advanced</span>
+  <a href="Part5_Practice.html">Part 5: Real-World Practice →</a>
+</div>
+
+</div>
+<div style="text-align:center;padding:30px;color:var(--lt);font-size:.85em;">Insurance Pricing Modelling Complete Course | Built for Ayush Sharma</div>
+</body>
+</html>

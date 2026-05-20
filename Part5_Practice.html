@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Part 5: Real-World Practice — Insurance Pricing Course</title>
+<style>
+:root{--p:#1a5276;--a:#2980b9;--g:#27ae60;--r:#e74c3c;--o:#f39c12;--bg:#f4f6f9;--c:#fff;--t:#2c3e50;--lt:#7f8c8d;--bd:#dee2e6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t);line-height:1.75;font-size:17px}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 35px}
+.hero{background:linear-gradient(135deg,#0b3d5b 0%,#1a5276 30%,#2980b9 70%,#1abc9c 100%);color:#fff;padding:50px 30px;text-align:center}
+.hero h1{font-size:2.5em;margin-bottom:8px;text-shadow:2px 2px 6px rgba(0,0,0,.4)}
+.hero .sub{opacity:.85;font-size:1.1em;max-width:700px;margin:0 auto}
+.hero .parttag{display:inline-block;background:rgba(255,255,255,.2);padding:6px 22px;border-radius:20px;margin-top:15px;font-weight:700}
+nav.breadcrumb{background:#fff;padding:12px 35px;font-size:.9em;border-bottom:1px solid var(--bd)}
+nav.breadcrumb a{color:var(--a);text-decoration:none} nav.breadcrumb a:hover{text-decoration:underline}
+.ch{background:var(--c);border-radius:14px;padding:40px 45px;margin:30px 0;box-shadow:0 2px 15px rgba(0,0,0,.06);border-left:6px solid var(--a);position:relative}
+.ch h2{color:var(--p);font-size:1.8em;margin-bottom:5px;padding-bottom:12px;border-bottom:2px solid #eee}
+.ch h3{color:var(--a);margin:28px 0 12px;font-size:1.35em}
+.ch h4{color:#34495e;margin:22px 0 10px;font-size:1.1em}
+.ch p,.ch li{margin:8px 0}.ch ul,.ch ol{padding-left:25px}
+.box{border-radius:10px;padding:18px 22px;margin:18px 0;border-left:5px solid}
+.eli5{background:#fef9e7;border-color:#f1c40f}.eli5::before{content:"🧒 Like You're 5: ";font-weight:700}
+.key{background:#eaf2f8;border-color:var(--a)}.key::before{content:"🔑 Key Insight: ";font-weight:700}
+.form{background:#f4ecf7;border-color:#8e44ad}.form::before{content:"📐 Formula: ";font-weight:700;font-family:'Segoe UI',sans-serif}
+.warn{background:#fdedec;border-color:var(--r)}.warn::before{content:"⚠️ Watch Out: ";font-weight:700}
+.ok{background:#eafaf1;border-color:var(--g)}.ok::before{content:"✅ ";font-weight:700}
+.think{background:#fdf2e9;border-color:#e67e22}.think::before{content:"🤔 Think About It: ";font-weight:700}
+.real{background:#e8f6f3;border-color:#16a085}.real::before{content:"🏢 Real World: ";font-weight:700}
+table{width:100%;border-collapse:collapse;margin:15px 0;font-size:.95em}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--bd)}
+th{background:var(--p);color:#fff;font-weight:600}
+tr:nth-child(even){background:#f8f9fa}tr:hover{background:#eaf2f8}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin:20px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}
+.gcard{border:2px solid var(--bd);border-radius:12px;padding:20px;text-align:center}
+.gcard .icon{font-size:2.5em;margin:8px 0}
+.gcard h4{margin:8px 0 5px}
+.step-list{counter-reset:steps}
+.step-list li{counter-increment:steps;list-style:none;padding:12px 15px 12px 55px;margin:8px 0;background:#fff;border-radius:8px;border:1px solid #eee;position:relative}
+.step-list li::before{content:counter(steps);position:absolute;left:12px;top:12px;background:var(--a);color:#fff;width:30px;height:30px;border-radius:50%;text-align:center;line-height:30px;font-weight:700;font-size:.9em}
+pre{background:#2c3e50;color:#ecf0f1;padding:18px 22px;border-radius:10px;overflow-x:auto;margin:15px 0;line-height:1.5;font-size:.88em}
+pre code{background:none;padding:0;color:inherit}
+code{background:#ecf0f1;padding:2px 6px;border-radius:4px;font-family:'Cascadia Code','Consolas',monospace;font-size:.9em}
+.highlight{background:linear-gradient(120deg,#ffeaa7 0%,#fdcb6e 100%);padding:2px 5px;border-radius:3px}
+.svg-chart{margin:20px auto;display:block}
+[id]{scroll-margin-top:20px}
+.flow{display:flex;align-items:stretch;gap:0;margin:22px 0;flex-wrap:wrap;justify-content:center}
+.fstep{padding:14px 18px;text-align:center;border-radius:10px;min-width:120px;font-size:.9em;display:flex;flex-direction:column;justify-content:center}
+.fstep strong{display:block;margin-bottom:3px}
+.farr{display:flex;align-items:center;font-size:1.5em;color:#bdc3c7;padding:0 5px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}
+.ccard{border-radius:12px;padding:20px;border:2px solid}.ccard h4{margin-top:0}
+.ccard.good{border-color:var(--g);background:#f0faf3}
+.ccard.bad{border-color:var(--r);background:#fdf0ef}
+.q{border:2px solid var(--bd);border-radius:12px;padding:22px;margin:20px 0}
+.q h4{margin-top:0;color:var(--p)}
+.q .diff{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.8em;font-weight:600;margin-bottom:8px}
+.q .easy{background:#d5f5e3;color:#1e8449}
+.q .med{background:#fef9e7;color:#b7950b}
+.q .hard{background:#fadbd8;color:#c0392b}
+.answer{background:#f8f9fa;border-radius:8px;padding:15px 18px;margin-top:12px;border:1px solid #eee}
+.answer summary{cursor:pointer;font-weight:700;color:var(--a)}
+.nav-footer{display:flex;justify-content:space-between;padding:30px 0;margin-top:30px;border-top:2px solid var(--bd)}
+.nav-footer a{color:var(--a);text-decoration:none;font-weight:600;font-size:1.1em}
+.nav-footer a:hover{text-decoration:underline}
+@media print{.ch{break-inside:avoid}}
+@media(max-width:768px){.grid3{grid-template-columns:1fr}.compare,.grid2{grid-template-columns:1fr}.ch{padding:25px 20px}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Insurance Pricing Modelling</h1>
+  <div class="sub">Rating Tables, Large Losses, IBNR, Credibility, Deployment & Interview Questions</div>
+  <div class="parttag">PART 5 of 5: REAL-WORLD PRACTICE</div>
+</div>
+
+<nav class="breadcrumb">
+  <a href="index.html">🏠 Course Home</a> &gt;
+  <a href="Part4_GAM_Advanced.html">Part 4: GAM</a> &gt;
+  <strong>Part 5: Real-World Practice</strong> &gt; Chapters 33–40
+</nav>
+
+<div class="wrap">
+
+<!-- ═══════════════════ CHAPTER 33 ═══════════════════ -->
+<div class="ch" id="ch33">
+<h2>Chapter 33: Rating Tables & How Underwriters Use Models</h2>
+
+<div class="box eli5">
+An underwriter doesn't open R and run code. They look at a spreadsheet (rating table). The model's job is to produce that table. Each cell in the table is a <strong>relativity</strong> — a multiplier. The underwriter looks up each factor, multiplies them together, and gets the base premium.
+</div>
+
+<h3>From Model to Rating Table</h3>
+
+<div class="flow">
+  <div class="fstep" style="background:#e8daef;">
+    <strong>Model Output</strong><br>β_UK = 0.26
+  </div>
+  <div class="farr">→</div>
+  <div class="fstep" style="background:#fef9e7;">
+    <strong>Exponentiate</strong><br>e<sup>0.26</sup> = 1.30
+  </div>
+  <div class="farr">→</div>
+  <div class="fstep" style="background:#d5f5e3;">
+    <strong>Rating Table</strong><br>UK factor: 1.30
+  </div>
+  <div class="farr">→</div>
+  <div class="fstep" style="background:#eaf2f8;">
+    <strong>Underwriter</strong><br>"Multiply by 1.30"
+  </div>
+</div>
+
+<h3>Example Rating Table (from Your Model)</h3>
+<table>
+  <tr><th colspan="3" style="background:#2c3e50;text-align:center;">COUNTRY RELATIVITIES</th></tr>
+  <tr><th>Country</th><th>Relativity</th><th>Interpretation</th></tr>
+  <tr style="background:#d5f5e3;"><td>Australia (base)</td><td><strong>1.00</strong></td><td>Reference</td></tr>
+  <tr><td>United Kingdom</td><td><strong>1.30</strong></td><td>+30% more expensive</td></tr>
+  <tr><td>Canada</td><td><strong>0.90</strong></td><td>−10% cheaper</td></tr>
+  <tr><td>Asia</td><td><strong>1.20</strong></td><td>+20% more expensive</td></tr>
+  <tr><td>Others</td><td><strong>1.49</strong></td><td>+49% more expensive</td></tr>
+</table>
+
+<h3>The Pricing Calculation</h3>
+<div class="box form">
+<strong>Technical Premium =</strong><br>
+Base Rate × Exposure Factor × Country Factor × Trade Factor × Binder Factor × Duration<br><br>
+<strong>Example:</strong><br>
+= $187 × f($5M) × 1.30 × 1.00 × 1.10 × 1.0<br>
+= $187 × 812 × 1.30 × 1.00 × 1.10<br>
+= $217,036 (technical premium before expenses/profit)
+</div>
+
+<h3>What Underwriters Add on Top</h3>
+<table>
+  <tr><th>Layer</th><th>Who Decides</th><th>Typical Range</th></tr>
+  <tr><td>Technical premium (model)</td><td>Pricing actuary</td><td>From model</td></tr>
+  <tr><td>+ Expense loading</td><td>Finance</td><td>25–35%</td></tr>
+  <tr><td>+ Profit margin</td><td>Management</td><td>5–15%</td></tr>
+  <tr><td>+ Large loss load</td><td>Actuary</td><td>10–30% of claims</td></tr>
+  <tr><td>± Underwriter judgment</td><td>Underwriter</td><td>−20% to +50%</td></tr>
+  <tr><td>= Final quoted premium</td><td>—</td><td>—</td></tr>
+</table>
+
+<div class="box real">
+At QBE, the model gives the "technical price." The underwriter can adjust up or down based on relationship, competition, and risk appetite. But any deviation from the technical price must be documented and approved (underwriter sign-off). The model is a guide, not a mandate.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 34 ═══════════════════ -->
+<div class="ch" id="ch34">
+<h2>Chapter 34: Large Losses — Capping, Truncation & ILFs</h2>
+
+<div class="box eli5">
+One huge $50M claim can distort your entire model. It's like one student who scored 1000% on a test — the average suddenly looks wrong for everyone. We "cap" large losses to prevent this, model the capped data, and then add a separate "large loss load" on top.
+</div>
+
+<h3>Why Cap Large Losses?</h3>
+<div class="compare">
+  <div class="ccard bad">
+    <h4>Without Capping</h4>
+    <ul>
+      <li>One $50M claim dominates the model</li>
+      <li>That policy's country/trade gets unfairly high relativity</li>
+      <li>Model is unstable year-to-year</li>
+      <li>Predictions are driven by randomness</li>
+    </ul>
+  </div>
+  <div class="ccard good">
+    <h4>With Capping at $5M</h4>
+    <ul>
+      <li>$50M claim becomes $5M (cap applied)</li>
+      <li>Model learns from attritional losses</li>
+      <li>Stable, reliable relativities</li>
+      <li>Large loss load added separately</li>
+    </ul>
+  </div>
+</div>
+
+<h3>How to Choose the Cap</h3>
+<div class="box form">
+Common approaches:<br>
+1. <strong>Percentile-based:</strong> Cap at 95th or 99th percentile of claim sizes<br>
+2. <strong>Fixed threshold:</strong> Cap at a round number (e.g., $1M, $5M) based on the book<br>
+3. <strong>X times average:</strong> Cap at 10× or 20× the average claim size<br>
+4. <strong>Business-driven:</strong> Cap at the retention level (what you keep vs reinsure)
+</div>
+
+<pre><code># R: Apply cap
+cap <- quantile(df$claims[df$claims > 0], 0.99)  # 99th percentile
+df$claims_capped <- pmin(df$claims, cap)
+
+# Or fixed cap:
+df$claims_capped <- pmin(df$claims, 5000000)  # Cap at $5M</code></pre>
+
+<h3>Increased Limit Factors (ILFs)</h3>
+<div class="box eli5">
+A policy with a $10M limit should cost more than one with a $1M limit. ILFs tell you exactly how much more. If ILF($10M) = 2.5, then a $10M policy should cost 2.5× a $1M policy (all else equal).
+</div>
+
+<div class="box form">
+ILF(L) = E[Claims capped at L] ÷ E[Claims capped at basic limit]<br><br>
+Example with basic limit = $1M:<br>
+ILF($1M) = 1.00 (by definition)<br>
+ILF($2M) = 1.45 (45% more for twice the limit)<br>
+ILF($5M) = 2.10<br>
+ILF($10M) = 2.50
+</div>
+
+<div class="box key">
+ILFs are typically derived from severity distributions (Pareto, lognormal, or mixed exponential) fitted to historical large losses. They represent the "cost of higher limits" and are a core component of commercial liability pricing.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 35 ═══════════════════ -->
+<div class="ch" id="ch35">
+<h2>Chapter 35: IBNR & Development Factors</h2>
+
+<div class="box eli5">
+When a construction worker gets injured today, the claim might not be reported for 6 months, and the final cost might not be known for 5 years (lawsuits, medical treatment, etc.). <strong>IBNR</strong> = "Incurred But Not Reported" — the money we know we'll owe but haven't seen yet. Development factors estimate how much bigger claims will grow.
+</div>
+
+<h3>The Problem: Claims Develop Over Time</h3>
+<svg class="svg-chart" width="600" height="200" viewBox="0 0 600 200">
+  <text x="300" y="18" text-anchor="middle" font-weight="bold" font-size="13" fill="#2c3e50">Claim Development Over Time</text>
+  
+  <line x1="60" y1="30" x2="60" y2="175" stroke="#bdc3c7" stroke-width="1"/>
+  <line x1="60" y1="175" x2="560" y2="175" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="30" y="100" text-anchor="middle" font-size="9" fill="#7f8c8d" transform="rotate(-90 30 100)">Total Claims ($)</text>
+  <text x="310" y="195" text-anchor="middle" font-size="9" fill="#7f8c8d">Months since accident →</text>
+  
+  <text x="90" y="190" font-size="8" fill="#7f8c8d">0</text>
+  <text x="160" y="190" font-size="8" fill="#7f8c8d">6</text>
+  <text x="230" y="190" font-size="8" fill="#7f8c8d">12</text>
+  <text x="300" y="190" font-size="8" fill="#7f8c8d">24</text>
+  <text x="370" y="190" font-size="8" fill="#7f8c8d">36</text>
+  <text x="440" y="190" font-size="8" fill="#7f8c8d">48</text>
+  <text x="510" y="190" font-size="8" fill="#7f8c8d">60</text>
+  
+  <!-- Development curve -->
+  <path d="M90,170 Q130,155 160,120 Q200,80 230,65 Q280,50 300,47 Q350,43 400,42 Q450,41 520,40" fill="none" stroke="#2980b9" stroke-width="3"/>
+  
+  <!-- Current known -->
+  <line x1="230" y1="30" x2="230" y2="175" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="4"/>
+  <text x="232" y="35" font-size="9" fill="#e74c3c" font-weight="bold">Today (12 months)</text>
+  
+  <!-- Known vs unknown -->
+  <path d="M90,170 Q130,155 160,120 Q200,80 230,65 L230,175 L90,175 Z" fill="#2980b9" fill-opacity="0.2"/>
+  <text x="160" y="145" text-anchor="middle" font-size="10" fill="#2980b9" font-weight="bold">Known</text>
+  
+  <path d="M230,65 Q280,50 300,47 Q350,43 400,42 Q450,41 520,40 L520,175 L230,175 Z" fill="#e74c3c" fill-opacity="0.15"/>
+  <text x="380" y="120" text-anchor="middle" font-size="10" fill="#e74c3c" font-weight="bold">IBNR</text>
+  <text x="380" y="135" text-anchor="middle" font-size="9" fill="#e74c3c">(must estimate)</text>
+  
+  <!-- Ultimate -->
+  <line x1="60" y1="40" x2="540" y2="40" stroke="#27ae60" stroke-width="1" stroke-dasharray="3"/>
+  <text x="540" y="35" font-size="9" fill="#27ae60" font-weight="bold">Ultimate</text>
+</svg>
+
+<h3>Development Factors (Link Ratios)</h3>
+<div class="box form">
+<strong>Development Factor</strong> = Claims at age (n+1) ÷ Claims at age n<br><br>
+Example (GL Construction):<br>
+• 12→24 month factor: 1.65 (claims grow 65%)<br>
+• 24→36 month factor: 1.15 (grow another 15%)<br>
+• 36→48 month factor: 1.05 (nearly stable)<br>
+• 48→ultimate factor: 1.02 (final tail)<br><br>
+<strong>Cumulative factor at 12 months = 1.65 × 1.15 × 1.05 × 1.02 = 2.01</strong><br>
+→ Claims at 12 months will roughly DOUBLE by ultimate.
+</div>
+
+<h3>Why This Matters for Pricing</h3>
+<div class="box key">
+Your model uses <strong>developed claims</strong> (ultimate estimates), not raw incurred claims. If you trained on raw claims from recent years (2021-2022), those claims are immature — they'll grow 50-100%. The development factors adjust them to ultimate before modelling. Without this adjustment, your model would systematically underprice recent years.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 36 ═══════════════════ -->
+<div class="ch" id="ch36">
+<h2>Chapter 36: Credibility & Shrinkage</h2>
+
+<div class="box eli5">
+Imagine a country that had only 5 policies in your data. One of them had a huge claim. Should the country relativity be 5.0× (based on that tiny sample)? Of course not — the data is unreliable. <strong>Credibility</strong> blends unreliable small-sample estimates with a more stable "average" — the less data you have, the more you lean on the average.
+</div>
+
+<h3>The Credibility Formula</h3>
+<div class="box form">
+<strong>Credibility-weighted estimate = Z × (observed rate) + (1 − Z) × (prior rate)</strong><br><br>
+Z = credibility factor (0 to 1)<br>
+• Z = 1 → fully trust the data (lots of claims)<br>
+• Z = 0 → ignore the data, use the average (no claims)<br><br>
+Common formula: <strong>Z = n / (n + K)</strong> where n = number of claims, K = credibility constant<br>
+If K = 50 and n = 100 claims: Z = 100/150 = 0.67 → 67% data, 33% average
+</div>
+
+<svg class="svg-chart" width="550" height="200" viewBox="0 0 550 200">
+  <text x="275" y="18" text-anchor="middle" font-weight="bold" font-size="12" fill="#2c3e50">Credibility Increases With Data Volume</text>
+  
+  <line x1="60" y1="30" x2="60" y2="170" stroke="#bdc3c7" stroke-width="1"/>
+  <line x1="60" y1="170" x2="520" y2="170" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="30" y="100" text-anchor="middle" font-size="9" fill="#7f8c8d" transform="rotate(-90 30 100)">Credibility Z</text>
+  <text x="290" y="190" text-anchor="middle" font-size="9" fill="#7f8c8d">Number of claims →</text>
+  
+  <!-- Axis -->
+  <text x="55" y="175" font-size="8" fill="#7f8c8d">0</text>
+  <text x="48" y="102" font-size="8" fill="#7f8c8d">0.5</text>
+  <text x="48" y="40" font-size="8" fill="#7f8c8d">1.0</text>
+  
+  <!-- 1.0 line -->
+  <line x1="60" y1="35" x2="520" y2="35" stroke="#27ae60" stroke-width="1" stroke-dasharray="3"/>
+  
+  <!-- Curve Z = n/(n+50) -->
+  <path d="M60,170 Q100,140 140,118 Q200,88 260,68 Q340,50 420,42 Q480,38 520,37" fill="none" stroke="#2980b9" stroke-width="3"/>
+  
+  <!-- Labels -->
+  <circle cx="100" cy="140" r="5" fill="#e74c3c"/>
+  <text x="105" y="155" font-size="9" fill="#e74c3c">5 claims → Z=0.09</text>
+  
+  <circle cx="200" cy="88" r="5" fill="#f39c12"/>
+  <text x="205" y="82" font-size="9" fill="#f39c12">50 claims → Z=0.50</text>
+  
+  <circle cx="350" cy="50" r="5" fill="#27ae60"/>
+  <text x="355" y="45" font-size="9" fill="#27ae60">200 claims → Z=0.80</text>
+</svg>
+
+<h3>How Credibility Appears in Your Model</h3>
+<div class="box real">
+The GAM naturally provides credibility-like behavior through the smoothing penalty. Categories with sparse data (e.g., "Asia" with few claims) have their coefficients pulled toward zero (the average). Categories with lots of data (e.g., "Australia") get coefficients closer to the raw data. This is called <strong>shrinkage</strong> — it's credibility done automatically by the model.
+</div>
+
+<div class="box key">
+<strong>In interviews:</strong> If asked "how do you handle categories with small volume?", mention three things:<br>
+1. Grouping (merge sparse categories together)<br>
+2. Credibility weighting (Z formula)<br>
+3. Regularization (Ridge/Lasso penalty shrinks sparse coefficients toward zero)
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 37 ═══════════════════ -->
+<div class="ch" id="ch37">
+<h2>Chapter 37: Model Deployment & Monitoring</h2>
+
+<div class="box eli5">
+Building the model is only half the job. Deploying it means putting it into the hands of underwriters (via rating tables or a quoting system). Monitoring means checking every quarter: "Is the model still accurate, or has the world changed?"
+</div>
+
+<h3>The Deployment Pipeline</h3>
+<ol class="step-list">
+  <li><strong>Build the model</strong> (what you've learned in this course)</li>
+  <li><strong>Extract relativities</strong> → Create rating tables in Excel</li>
+  <li><strong>Peer review</strong> → Another actuary reviews code, data, and assumptions</li>
+  <li><strong>Management sign-off</strong> → Chief Actuary approves</li>
+  <li><strong>Implement in quoting system</strong> → IT loads the tables into the pricing tool</li>
+  <li><strong>Parallel run</strong> → Run old AND new model side-by-side for 1-3 months</li>
+  <li><strong>Go live</strong> → New model becomes the official pricing basis</li>
+  <li><strong>Monitor quarterly</strong> → Track A/E ratios, Gini, portfolio mix changes</li>
+</ol>
+
+<h3>What to Monitor After Deployment</h3>
+<table>
+  <tr><th>Metric</th><th>Check</th><th>Red Flag</th></tr>
+  <tr><td>A/E ratio (overall)</td><td>Should be ~1.00</td><td>Persistently > 1.10 or < 0.90</td></tr>
+  <tr><td>A/E by segment</td><td>Each segment ~1.00</td><td>One segment consistently off</td></tr>
+  <tr><td>Gini coefficient</td><td>Stable or improving</td><td>Drops > 0.05 from baseline</td></tr>
+  <tr><td>Portfolio mix</td><td>Stable distribution of risks</td><td>Big shift → model may not fit new mix</td></tr>
+  <tr><td>Hit ratio</td><td>Win rate on quotes</td><td>If too low → model might overprice</td></tr>
+</table>
+
+<div class="box warn">
+<strong>Model drift:</strong> A model built on 2018-2022 data may not work well in 2025 if:<br>
+• Inflation changes claim sizes (social inflation in the US)<br>
+• New construction methods change risk profiles<br>
+• Regulatory changes affect liability<br>
+• Portfolio shifts to different countries/trades<br><br>
+Re-fit the model at least annually with fresh data.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 38 ═══════════════════ -->
+<div class="ch" id="ch38">
+<h2>Chapter 38: End-to-End Worked Example</h2>
+
+<div class="box eli5">
+Let's walk through the entire pricing process from raw data to premium — exactly as you do it at QBE. This chapter ties everything together.
+</div>
+
+<h3>The Complete Pipeline</h3>
+<svg class="svg-chart" width="700" height="80" viewBox="0 0 700 80">
+  <rect x="5" y="20" width="80" height="40" rx="8" fill="#1a5276"/>
+  <text x="45" y="45" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">Raw Data</text>
+  <text x="100" y="44" font-size="14" fill="#bdc3c7">→</text>
+  
+  <rect x="110" y="20" width="80" height="40" rx="8" fill="#2980b9"/>
+  <text x="150" y="45" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">Clean &amp; EDA</text>
+  <text x="205" y="44" font-size="14" fill="#bdc3c7">→</text>
+  
+  <rect x="215" y="20" width="80" height="40" rx="8" fill="#27ae60"/>
+  <text x="255" y="45" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">Develop &amp; Cap</text>
+  <text x="310" y="44" font-size="14" fill="#bdc3c7">→</text>
+  
+  <rect x="320" y="20" width="80" height="40" rx="8" fill="#f39c12"/>
+  <text x="360" y="45" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">Feature Eng.</text>
+  <text x="415" y="44" font-size="14" fill="#bdc3c7">→</text>
+  
+  <rect x="425" y="20" width="80" height="40" rx="8" fill="#e74c3c"/>
+  <text x="465" y="45" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">Fit GAM</text>
+  <text x="520" y="44" font-size="14" fill="#bdc3c7">→</text>
+  
+  <rect x="530" y="20" width="80" height="40" rx="8" fill="#8e44ad"/>
+  <text x="570" y="45" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">Validate</text>
+  <text x="625" y="44" font-size="14" fill="#bdc3c7">→</text>
+  
+  <rect x="635" y="20" width="60" height="40" rx="8" fill="#16a085"/>
+  <text x="665" y="45" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">Deploy</text>
+</svg>
+
+<h3>Step-by-Step (Your QBE Construction Model)</h3>
+
+<h4>Step 1: Raw Data (38,230 policies)</h4>
+<pre><code># 255 columns from 8 data sources
+# Merge on policy_id and inception_date
+# Result: one row per policy-year</code></pre>
+
+<h4>Step 2: Clean & EDA</h4>
+<pre><code># Filter: exposure >= $100K (removes tiny/test policies)
+# → 35,650 policies remain
+# Claim frequency: 10.1% (3,600 claims)
+# Explore: exposure distribution, loss ratios by country/trade</code></pre>
+
+<h4>Step 3: Develop & Cap Claims</h4>
+<pre><code># Apply development factors to immature years (2021-2022)
+# Cap large losses at 99th percentile
+# Inflation-adjust exposures to common year basis</code></pre>
+
+<h4>Step 4: Feature Engineering</h4>
+<pre><code># log10(exposure) — compress the scale
+# Country grouping: 70 countries → 5 groups
+# Trade grouping: many NAICS → 2 groups
+# Binder classification: 8 sources → 3 categories</code></pre>
+
+<h4>Step 5: Fit the GAM</h4>
+<pre><code>library(mgcv)
+model <- bam(
+  claims_developed_capped ~
+    s(log10(TradeExposureUSD_Inflated), k = 5) +
+    country_group +
+    sub_trade +
+    is_binder,
+  family = tw(p = 1.5),    # Tweedie
+  offset = log(PolicyDurationYear),
+  data = df
+)
+summary(model)
+# AIC: 122,609 | Deviance explained: 28%</code></pre>
+
+<h4>Step 6: Validate</h4>
+<pre><code># 20-fold cross-validation
+# CV Gini: 0.37 | CV RMSE: $45K
+# Residual plots: no patterns → good
+# A/E by country: all within 0.90–1.10 → good
+# Lorenz curve: clear lift over random</code></pre>
+
+<h4>Step 7: Deploy</h4>
+<pre><code># Extract relativities → Excel rating tables
+# Peer review → approved
+# Load into quoting system → go live
+# Monitor quarterly A/E</code></pre>
+
+<div class="box ok">
+<strong>That's it.</strong> From 38K raw policies to a deployed pricing model. Every chapter in this course has covered one piece of this pipeline. You now understand the full end-to-end process.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 39 ═══════════════════ -->
+<div class="ch" id="ch39">
+<h2>Chapter 39: Common Pitfalls & Best Practices</h2>
+
+<h3>The Top 10 Mistakes in Insurance Pricing Models</h3>
+
+<table>
+  <tr><th>#</th><th>Mistake</th><th>Why It's Bad</th><th>Fix</th></tr>
+  <tr><td>1</td><td>Not developing claims</td><td>Underprices recent years</td><td>Apply development factors before modelling</td></tr>
+  <tr><td>2</td><td>Not capping large losses</td><td>One claim dominates the model</td><td>Cap at 99th percentile, add large loss load</td></tr>
+  <tr><td>3</td><td>Using Normal distribution</td><td>Predicts negative claims</td><td>Use Tweedie with log link</td></tr>
+  <tr><td>4</td><td>Too many variables</td><td>Overfitting, unstable relativities</td><td>5-15 variables max, use CV to validate</td></tr>
+  <tr><td>5</td><td>Ignoring exposure offset</td><td>2-year policies treated same as 1-year</td><td>Use offset(log(duration))</td></tr>
+  <tr><td>6</td><td>No cross-validation</td><td>Don't know if model generalizes</td><td>K-fold CV with Gini, AIC, RMSE</td></tr>
+  <tr><td>7</td><td>Sparse categories</td><td>Unreliable relativities</td><td>Group, credibility-weight, or regularize</td></tr>
+  <tr><td>8</td><td>Linear exposure effect</td><td>Misses non-linear relationship</td><td>Use GAM smooth s(log10(exposure))</td></tr>
+  <tr><td>9</td><td>No inflation adjustment</td><td>Old years underweight, new years overweight</td><td>Inflate exposures to common year</td></tr>
+  <tr><td>10</td><td>No monitoring</td><td>Model degrades without detection</td><td>Quarterly A/E review, annual re-fit</td></tr>
+</table>
+
+<h3>Best Practices Checklist</h3>
+<div class="grid2">
+  <div class="gcard" style="border-color:#27ae60;">
+    <h4>Data Preparation</h4>
+    <ul style="text-align:left;font-size:.9em;">
+      <li>✅ Develop claims to ultimate</li>
+      <li>✅ Cap large losses</li>
+      <li>✅ Inflation-adjust exposures</li>
+      <li>✅ Filter out test/tiny policies</li>
+      <li>✅ Check for duplicates</li>
+    </ul>
+  </div>
+  <div class="gcard" style="border-color:#2980b9;">
+    <h4>Modelling</h4>
+    <ul style="text-align:left;font-size:.9em;">
+      <li>✅ Start simple (GLM), add complexity (GAM)</li>
+      <li>✅ Use log link + Tweedie</li>
+      <li>✅ Include offset for duration</li>
+      <li>✅ Group sparse categories</li>
+      <li>✅ Cross-validate (20 folds)</li>
+    </ul>
+  </div>
+  <div class="gcard" style="border-color:#f39c12;">
+    <h4>Validation</h4>
+    <ul style="text-align:left;font-size:.9em;">
+      <li>✅ Residual plots (no patterns)</li>
+      <li>✅ Lorenz curve / Gini</li>
+      <li>✅ A/E by key segments</li>
+      <li>✅ One-way plots make sense</li>
+      <li>✅ Compare GLM vs GAM vs GBM</li>
+    </ul>
+  </div>
+  <div class="gcard" style="border-color:#e74c3c;">
+    <h4>Deployment</h4>
+    <ul style="text-align:left;font-size:.9em;">
+      <li>✅ Peer review of code + results</li>
+      <li>✅ Management sign-off</li>
+      <li>✅ Parallel run before go-live</li>
+      <li>✅ Quarterly monitoring (A/E)</li>
+      <li>✅ Annual model re-fit</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 40 ═══════════════════ -->
+<div class="ch" id="ch40">
+<h2>Chapter 40: Interview Questions — Easy, Medium & Hard</h2>
+
+<div class="box key">
+These 25 questions cover the most commonly asked topics in insurance pricing interviews. For each question, try to answer it yourself before clicking the answer.
+</div>
+
+<!-- EASY -->
+<h3 style="color:#27ae60;">EASY (5 Questions)</h3>
+
+<div class="q">
+  <span class="diff easy">EASY</span>
+  <h4>Q1: What distribution do you use for insurance claims, and why?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p><strong>Tweedie distribution</strong> (compound Poisson-Gamma) with a log link. Insurance claims have two key features: (1) many policies have zero claims, and (2) non-zero claims are positive and right-skewed. Tweedie naturally handles this mix of zeros and positive continuous values. The power parameter p (typically 1.3–1.7) controls the zero-mass. We use p ≈ 1.5 for construction GL. Normal distribution fails because it predicts negative claims. Poisson is for counts only. Gamma can't handle zeros.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff easy">EASY</span>
+  <h4>Q2: What is a link function? Why do we use the log link?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>A link function g() transforms the expected value μ to the linear predictor scale: g(μ) = η = β₀ + β₁X₁ + ... The <strong>log link</strong> means log(μ) = η, so μ = e<sup>η</sup>. Benefits: (1) predictions are always positive (can't predict negative premiums), (2) effects are multiplicative — each factor multiplies the premium, which is how rating tables work, (3) it's the canonical link for Poisson and works well with Gamma/Tweedie.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff easy">EASY</span>
+  <h4>Q3: What is a relativity? How do you interpret β = 0.26 for UK?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>A relativity is e<sup>β</sup>, the multiplicative factor for that category relative to the base. β_UK = 0.26 → relativity = e<sup>0.26</sup> = 1.30. This means UK policies are 30% more expensive than the base (Australia). In the rating table, the underwriter multiplies the base premium by 1.30 for UK risks.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff easy">EASY</span>
+  <h4>Q4: What is an offset in a GLM? Give an example.</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>An offset is a variable with a fixed coefficient of 1 (not estimated by the model). We use <code>offset = log(PolicyDuration)</code> to make the model proportional to duration: a 2-year policy should have exactly 2× the expected claims. This means the model estimates the annual RATE, and the offset scales it by duration. Without the offset, the model would waste a parameter estimating what we already know.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff easy">EASY</span>
+  <h4>Q5: What is the difference between a GLM and a GAM?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>A GLM models continuous predictors as straight lines (on the link scale): log(μ) = β₀ + β₁X. A GAM replaces the linear term with a smooth function: log(μ) = β₀ + f(X). The smooth f(X) is built from splines (piecewise polynomials), allowing the model to capture non-linear relationships. Categorical variables are handled the same way in both. GAM = GLM + smooth terms for continuous variables.</p>
+  </details>
+</div>
+
+<!-- MEDIUM -->
+<h3 style="color:#f39c12;">MEDIUM (10 Questions)</h3>
+
+<div class="q">
+  <span class="diff med">MEDIUM</span>
+  <h4>Q6: Explain the Frequency × Severity approach vs the Tweedie approach.</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p><strong>Freq × Sev:</strong> Build two separate models — Poisson for frequency (how many claims) and Gamma for severity (how large). Multiply predictions: E[Claims] = E[Freq] × E[Sev]. Advantage: separate insights into what drives frequency vs severity. <strong>Tweedie:</strong> One model for the combined loss cost directly. The Tweedie distribution is mathematically equivalent to a compound Poisson-Gamma, so it implicitly does freq × sev. Advantage: simpler, one model to maintain. In practice, Tweedie gives very similar predictions to explicit freq × sev.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff med">MEDIUM</span>
+  <h4>Q7: How do you handle large losses in a pricing model?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>Cap (truncate) claims at a threshold (e.g., 99th percentile or a fixed amount like $5M). Model the capped claims to get stable attritional relativities. Then add a <strong>large loss load</strong> on top — estimated separately from severity distributions (Pareto/lognormal) fitted to large claims above the cap. This separates the attritional pricing (model-driven) from the large loss pricing (actuarial judgment). For different limits, use ILFs (Increased Limit Factors).</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff med">MEDIUM</span>
+  <h4>Q8: What is cross-validation and why is it important?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>K-fold CV splits data into K equal parts. For each fold, train on K-1 parts and test on the held-out part. Average the test metrics across all folds. It's important because: (1) it estimates out-of-sample performance (will the model work on new data?), (2) it detects overfitting (model that fits training data but fails on test data), (3) it enables honest comparison between candidate models. I use 20-fold CV with Gini, AIC, deviance, and RMSE as metrics.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff med">MEDIUM</span>
+  <h4>Q9: What is the Gini coefficient in pricing, and what's a good value?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>The Gini coefficient measures how well the model <strong>ranks</strong> risks from low to high. It's calculated from the Lorenz curve: sort policies by predicted risk, plot cumulative actual claims vs cumulative policies. Gini = 2 × area between the model curve and the 45° diagonal. Range: 0 (random) to 1 (perfect). For insurance pricing, Gini = 0.20–0.30 is decent, 0.30–0.40 is good, > 0.40 is very good. My construction model achieves Gini ≈ 0.37.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff med">MEDIUM</span>
+  <h4>Q10: How do you decide which variables to include in your model?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>A combination of: (1) <strong>Domain knowledge</strong> — exposure, country, trade are obvious risk drivers. (2) <strong>One-way plots</strong> — visual check for signal. (3) <strong>AIC improvement</strong> — does adding the variable reduce AIC by > 2? (4) <strong>Statistical significance</strong> — p-value < 0.05. (5) <strong>Cross-validation</strong> — does it improve out-of-sample Gini? (6) <strong>Business sense</strong> — can I explain to underwriters why this factor matters? I test 20+ candidate formulas via 20-fold CV and pick the best.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff med">MEDIUM</span>
+  <h4>Q11: What is overdispersion and how do you handle it?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>Overdispersion means the actual variance is larger than what the assumed distribution predicts. For Poisson, Var = μ. If actual Var > μ, that's overdispersion. Common in insurance because risks are heterogeneous. Solutions: (1) Quasi-Poisson — adds a dispersion parameter φ so Var = φμ. (2) Negative Binomial — Var = μ + μ²/k. (3) <strong>Tweedie</strong> — Var = φμ<sup>p</sup>, naturally handles overdispersion via the p parameter. The Tweedie approach is most common in modern pricing.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff med">MEDIUM</span>
+  <h4>Q12: Explain how splines work in a GAM.</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>A spline is a smooth curve built from <strong>basis functions</strong>. With k knots, we get roughly k basis functions B₁(x), ..., B_k(x). The smooth is f(x) = γ₁B₁(x) + ... + γ_kB_k(x). The model estimates the weights γᵢ via penalized maximum likelihood. A smoothing parameter λ penalizes the integrated squared second derivative (wiggliness). Higher λ → smoother curve. REML (Restricted Maximum Likelihood) automatically chooses λ. The effective degrees of freedom (EDF) tells you how flexible the resulting smooth is: EDF=1 → straight line, EDF=k-1 → maximum flexibility.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff med">MEDIUM</span>
+  <h4>Q13: What is IBNR and why does it matter for pricing?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>IBNR = Incurred But Not Reported. Claims can take months to report and years to settle. Recent years have immature claims that will grow. Development factors estimate the ultimate size: if a 12-month development factor is 1.65, claims at 12 months will grow 65% by ultimate. For pricing, we must use <strong>developed (ultimate) claims</strong>, not raw incurred. Without development, the model would systematically underprice recent years because their claims haven't fully materialized.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff med">MEDIUM</span>
+  <h4>Q14: How would you compare a GLM vs a GBM for pricing?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>Compare on: (1) <strong>Predictive accuracy</strong> — CV Gini, deviance. GBM often wins slightly. (2) <strong>Interpretability</strong> — GLM has clear coefficients/relativities; GBM needs SHAP values. (3) <strong>Regulatory acceptance</strong> — GLMs are standard; GBMs are gaining acceptance. (4) <strong>Rating table extraction</strong> — direct from GLM; requires approximation for GBM. Industry practice: use GLM/GAM as the primary model for rating tables, use GBM as a benchmark to check if the GLM misses interactions or non-linearities. If GBM is significantly better, investigate what the GLM is missing.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff med">MEDIUM</span>
+  <h4>Q15: What is credibility and when do you apply it?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>Credibility blends observed data with a prior (average) based on data volume: Estimate = Z × observed + (1-Z) × prior, where Z = n/(n+K). Small volume → low Z → lean on average. Large volume → high Z → trust the data. Applied when: (1) a country/trade has few claims → credibility-weight toward portfolio average, (2) an individual risk's experience is used for renewal pricing, (3) any time you're estimating parameters from sparse data. In GAMs, shrinkage/penalization achieves similar results automatically.</p>
+  </details>
+</div>
+
+<!-- HARD -->
+<h3 style="color:#e74c3c;">HARD (10 Questions)</h3>
+
+<div class="q">
+  <span class="diff hard">HARD</span>
+  <h4>Q16: Explain the Tweedie power parameter p. What happens at p=1, p=1.5, p=2?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>The Tweedie family has Var(Y) = φμ<sup>p</sup>. The power parameter p determines the distribution type:<br>
+    • p = 0: Normal<br>
+    • p = 1: Poisson<br>
+    • <strong>1 < p < 2: Compound Poisson-Gamma</strong> (this is insurance pricing territory)<br>
+    • p = 2: Gamma<br>
+    • p = 3: Inverse Gaussian<br>
+    At p = 1.5 (your model), it's a balanced mix of zero-inflated (Poisson-like) and continuous positive (Gamma-like). As p → 1, more zero mass (more zero claims). As p → 2, fewer zeros but heavier right tail. We estimate p from data using profile likelihood.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff hard">HARD</span>
+  <h4>Q17: Why do we use REML instead of ML to estimate smoothing parameters?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>ML estimation of smoothing parameters is biased downward — it tends to make smooths too wiggly because it doesn't account for the loss of degrees of freedom from estimating the fixed effects (β). REML (Restricted Maximum Likelihood) marginalizes over the fixed effects before optimizing for λ, giving unbiased estimates of the variance/smoothing parameters. This is the same reason REML is preferred over ML for variance components in mixed models. In mgcv, <code>method = "REML"</code> is the default and recommended approach.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff hard">HARD</span>
+  <h4>Q18: How would you detect and handle interaction effects in a pricing model?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>Detection: (1) Plot residuals by subgroups (e.g., residuals for UK vs AU at different exposure levels). If patterns differ, there's an interaction. (2) Fit a GBM and examine SHAP interaction values. (3) Add explicit interaction terms and check AIC improvement. (4) Use tensor product smooths: <code>te(log10exp, country)</code> or <code>s(log10exp, by=country)</code>.<br>
+    Handling: (1) In GLM: add interaction terms X₁:X₂. (2) In GAM: use <code>s(x, by=factor)</code> for separate smooths per category, or <code>te(x1, x2)</code> for smooth-smooth interactions. (3) Credibility constraint: only include interactions where both main effects have sufficient volume. With 3,600 claims, I'd be cautious — maybe 1-2 key interactions maximum.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff hard">HARD</span>
+  <h4>Q19: Explain the bias-variance tradeoff in the context of k (knots) and λ (smoothing).</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>Bias = model can't capture the true shape (underfitting). Variance = model is too sensitive to noise (overfitting). <strong>k (knots)</strong> sets the ceiling: small k → high bias (can't be flexible enough), large k → low bias but high variance potential. <strong>λ (smoothing)</strong> controls actual flexibility within that ceiling: large λ → high bias (forces straightness), small λ → low bias but high variance (too wiggly). The optimal point minimizes total error = bias² + variance. REML chooses λ to balance this. The modeller sets k large enough that the true shape can be captured, then trusts REML to prevent overfitting via λ. For insurance with moderate data, k=5-10 with REML-selected λ typically hits the sweet spot.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff hard">HARD</span>
+  <h4>Q20: How would you build a pricing model for a completely new line of business with no historical data?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>(1) <strong>Benchmark:</strong> Find similar lines (e.g., if pricing cyber, look at E&O/professional liability as a starting point). (2) <strong>Industry data:</strong> Use ISO/market study data for base rates. (3) <strong>Expert judgment:</strong> Gather underwriter opinion on key risk factors, translate to relativities. (4) <strong>Analogue models:</strong> Build a model on the closest existing line and adjust coefficients based on expected differences. (5) <strong>Pricing formula:</strong> Start with a simple burn-cost model (expected loss / expected premium) with manual adjustments. (6) <strong>Monitor aggressively:</strong> Review A/E monthly in the first year. Refit quarterly as data accumulates. (7) <strong>Credibility ramp:</strong> Start with low credibility on own data, gradually increase as volume builds.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff hard">HARD</span>
+  <h4>Q21: What is the difference between AIC, BIC, and deviance for model selection?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p><strong>Deviance</strong> = 2 × (log-lik(saturated) − log-lik(model)). Measures fit only. Lower = better fit. Always decreases with more parameters.<br>
+    <strong>AIC</strong> = Deviance + 2 × (number of parameters). Penalizes complexity. Balances fit and parsimony. Prefers the model that generalizes best to new data.<br>
+    <strong>BIC</strong> = Deviance + log(n) × (number of parameters). Penalty grows with sample size. More conservative than AIC — prefers simpler models, especially with large n.<br>
+    In practice: AIC is most common in insurance pricing. BIC is used when you want fewer variables. Deviance alone is used in nested model comparisons (deviance tests). For GAMs, AIC needs adjustment for EDF; use the AIC reported by mgcv which accounts for this.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff hard">HARD</span>
+  <h4>Q22: How would you handle inflation trends in a multi-year pricing model?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>(1) <strong>Exposure inflation:</strong> Inflate all exposures to the current year using CPI or construction cost index. This makes exposures comparable across years. (2) <strong>Claims inflation:</strong> Index historical claims to current dollars using claims inflation (often different from CPI — "social inflation" in liability). (3) <strong>Superimposed inflation:</strong> Beyond economic inflation, liability claims may increase due to legal trends, regulatory changes, etc. Add a trend factor. (4) <strong>Year effect in model:</strong> Include underwriting year as a variable (or smooth s(uw_year)) to capture residual trends. (5) <strong>Projection:</strong> When setting rates, project inflation forward to the midpoint of the policy period. (6) <strong>Validation:</strong> Check A/E by year — if recent years are consistently > 1.0, you're under-adjusting for inflation.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff hard">HARD</span>
+  <h4>Q23: What are the key assumptions of a GLM, and how do you check each one?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>(1) <strong>Distribution assumption:</strong> The response follows the specified distribution (e.g., Tweedie). Check: Q-Q plot of deviance residuals; compare deviance statistics across families. (2) <strong>Link function assumption:</strong> g(μ) = η is the correct transformation. Check: plot residuals vs fitted values — random scatter means OK. (3) <strong>Linearity (on link scale):</strong> Each predictor has a linear effect on η. Check: plot residuals vs each predictor — curves mean you need a GAM. (4) <strong>Independence:</strong> Observations are independent. Check: no autocorrelation in residuals; no clustering. (5) <strong>Variance function:</strong> Var(Y) = φV(μ) holds. Check: plot |residuals| vs fitted — should match assumed V(μ). (6) <strong>No multicollinearity:</strong> Predictors aren't perfectly correlated. Check: VIF < 5.</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff hard">HARD</span>
+  <h4>Q24: How would you use a GBM to improve a GLM/GAM model?</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p>(1) Fit GBM on same data and compare CV Gini. If GBM is significantly better → the GLM/GAM is missing something. (2) Check GBM <strong>variable importance</strong> → any important variables that the GLM excluded? Add them. (3) Check GBM <strong>SHAP partial dependence plots</strong> → any non-linear shapes the GAM's splines missed? Increase k. (4) Check GBM <strong>SHAP interaction values</strong> → any interactions the GLM doesn't have? Add them. (5) Use GBM predictions as a "benchmark" premium — compare GLM vs GBM premium for each policy. Large discrepancies flag risks where the GLM may be wrong. (6) <strong>Stacking:</strong> Use GBM predictions as an additional input feature in the GLM (with care for overfitting).</p>
+  </details>
+</div>
+
+<div class="q">
+  <span class="diff hard">HARD</span>
+  <h4>Q25: Walk me through your end-to-end pricing model process at QBE.</h4>
+  <details class="answer">
+    <summary>Click to reveal answer</summary>
+    <p><strong>Data:</strong> 38K construction GL policies, 255 columns, 8 data sources, 70 countries, UW years 2013–2022. Filter to exposure ≥ $100K → 35,650 policies, 10.1% claim frequency.<br>
+    <strong>Preparation:</strong> Develop immature claims with chain-ladder factors. Cap large losses at 99th percentile. Inflate exposures to 2022 dollars. Feature engineering: log₁₀(exposure), group 70 countries → 5, group trades → 2, classify binders → 3.<br>
+    <strong>Model:</strong> Tweedie GAM (p=1.5, log link) via mgcv::bam. Formula: claims ~ s(log10(exposure), k=5) + country_group + sub_trade + is_binder, offset = log(duration). AIC = 122,609.<br>
+    <strong>Validation:</strong> 20-fold CV. Tested 20+ formulas. Best model: Gini = 0.37, residuals clean, A/E by segment within 0.90–1.10. GAM beats GLM by ΔAIC = 1,148.<br>
+    <strong>Deployment:</strong> Extract relativities → Excel rating tables. Peer review → Chief Actuary sign-off → load into quoting system → quarterly A/E monitoring. Annual re-fit with new data.</p>
+  </details>
+</div>
+
+</div>
+
+<!-- NAV FOOTER -->
+<div class="nav-footer">
+  <a href="Part4_GAM_Advanced.html">← Part 4: GAM & Advanced</a>
+  <span style="color:var(--lt);">Part 5 of 5: Real-World Practice</span>
+  <a href="index.html">🏠 Course Home</a>
+</div>
+
+</div>
+<div style="text-align:center;padding:30px;color:var(--lt);font-size:.85em;">Insurance Pricing Modelling Complete Course | Built for Ayush Sharma</div>
+</body>
+</html>

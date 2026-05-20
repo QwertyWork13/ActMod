@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Insurance Pricing Modelling — Complete Course</title>
+<style>
+:root{--p:#1a5276;--a:#2980b9;--g:#27ae60;--r:#e74c3c;--o:#f39c12;--bg:#f4f6f9;--c:#fff;--t:#2c3e50;--lt:#7f8c8d;--bd:#dee2e6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t);line-height:1.75;font-size:17px}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 35px}
+.hero{background:linear-gradient(135deg,#0b3d5b 0%,#1a5276 25%,#2980b9 50%,#1abc9c 75%,#16a085 100%);color:#fff;padding:60px 30px;text-align:center}
+.hero h1{font-size:2.8em;margin-bottom:8px;text-shadow:2px 2px 8px rgba(0,0,0,.4)}
+.hero .sub{opacity:.9;font-size:1.15em;max-width:700px;margin:10px auto}
+.hero .badge{display:inline-block;background:rgba(255,255,255,.2);padding:8px 25px;border-radius:25px;margin-top:15px;font-weight:700;font-size:1.05em}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin:30px 0}
+.stat{background:#fff;border-radius:12px;padding:22px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.stat .num{font-size:2.2em;font-weight:800;color:var(--a)}
+.stat .lbl{font-size:.85em;color:var(--lt)}
+.part{background:#fff;border-radius:14px;padding:30px 35px;margin:25px 0;box-shadow:0 2px 15px rgba(0,0,0,.06);border-left:6px solid var(--a);transition:transform .15s}
+.part:hover{transform:translateX(5px)}
+.part h2{font-size:1.5em;margin-bottom:5px}
+.part h2 a{color:var(--p);text-decoration:none}
+.part h2 a:hover{color:var(--a);text-decoration:underline}
+.part .desc{color:var(--lt);margin-bottom:12px;font-size:.95em}
+.ch-list{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-top:10px}
+.ch-list a{display:block;padding:4px 0;color:var(--t);text-decoration:none;font-size:.92em;border-bottom:1px dotted #eee}
+.ch-list a:hover{color:var(--a)}
+.ch-list a .chnum{color:var(--a);font-weight:700;margin-right:5px}
+.tag{display:inline-block;padding:3px 12px;border-radius:12px;font-size:.78em;font-weight:600;margin-right:5px}
+.tag-b{background:#d6eaf8;color:#2471a3}.tag-g{background:#d5f5e3;color:#1e8449}
+.tag-p{background:#e8daef;color:#6c3483}.tag-o{background:#fef9e7;color:#b7950b}
+.tag-r{background:#fadbd8;color:#c0392b}
+.prereq{background:#fff;border-radius:14px;padding:25px 30px;margin:25px 0;box-shadow:0 2px 15px rgba(0,0,0,.06);border-left:6px solid #27ae60}
+.prereq h3{color:#1e8449;margin-bottom:8px}
+a{color:var(--a)}
+@media(max-width:768px){.stats{grid-template-columns:1fr 1fr}.ch-list{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Insurance Pricing Modelling</h1>
+  <div class="sub">A complete course from absolute basics to advanced techniques — with simple explanations, visual diagrams, and real-world QBE Construction GL examples.</div>
+  <div class="badge">40 CHAPTERS • 5 PARTS • COMPLETE COURSE</div>
+</div>
+
+<div class="wrap">
+
+<div class="stats">
+  <div class="stat"><div class="num">40</div><div class="lbl">Chapters</div></div>
+  <div class="stat"><div class="num">5</div><div class="lbl">Parts</div></div>
+  <div class="stat"><div class="num">25</div><div class="lbl">Interview Q&As</div></div>
+  <div class="stat"><div class="num">50+</div><div class="lbl">SVG Diagrams</div></div>
+</div>
+
+<div class="prereq">
+  <h3>Prerequisites</h3>
+  <p>Basic probability (Normal, Poisson, Binomial), basic statistics (mean, variance, standard deviation), willingness to learn. No coding experience required — R code is shown for reference only.</p>
+</div>
+
+<!-- PART 1 -->
+<div class="part" style="border-color:#1a5276;">
+  <h2><a href="Part1_Foundations.html">Part 1: Foundations — Insurance & Data</a></h2>
+  <div class="desc">
+    <span class="tag tag-b">BEGINNER</span> What is insurance? How does pricing work? What does insurance data look like? Probability refresher. Why Normal distribution fails for claims.
+  </div>
+  <div class="ch-list">
+    <a href="Part1_Foundations.html#ch1"><span class="chnum">Ch 1</span> What Is Insurance & Why Pricing Matters</a>
+    <a href="Part1_Foundations.html#ch2"><span class="chnum">Ch 2</span> The Pricing Pipeline</a>
+    <a href="Part1_Foundations.html#ch3"><span class="chnum">Ch 3</span> Insurance Data — What You Work With</a>
+    <a href="Part1_Foundations.html#ch4"><span class="chnum">Ch 4</span> Exploratory Data Analysis (EDA)</a>
+    <a href="Part1_Foundations.html#ch5"><span class="chnum">Ch 5</span> Probability Refresher</a>
+    <a href="Part1_Foundations.html#ch6"><span class="chnum">Ch 6</span> Normal Distribution (& Why It Fails)</a>
+    <a href="Part1_Foundations.html#ch7"><span class="chnum">Ch 7</span> Poisson Distribution — Counting Claims</a>
+    <a href="Part1_Foundations.html#ch8"><span class="chnum">Ch 8</span> Gamma, Lognormal & Pareto</a>
+  </div>
+</div>
+
+<!-- PART 2 -->
+<div class="part" style="border-color:#2980b9;">
+  <h2><a href="Part2_Distributions_Tweedie.html">Part 2: Distributions & The Tweedie Family</a></h2>
+  <div class="desc">
+    <span class="tag tag-b">INTERMEDIATE</span> Frequency × Severity, Maximum Likelihood, Tweedie distribution, variance functions, overdispersion, and the complete distribution decision framework.
+  </div>
+  <div class="ch-list">
+    <a href="Part2_Distributions_Tweedie.html#ch9"><span class="chnum">Ch 9</span> The Frequency × Severity Framework</a>
+    <a href="Part2_Distributions_Tweedie.html#ch10"><span class="chnum">Ch 10</span> Maximum Likelihood Estimation (MLE)</a>
+    <a href="Part2_Distributions_Tweedie.html#ch11"><span class="chnum">Ch 11</span> The Tweedie Distribution</a>
+    <a href="Part2_Distributions_Tweedie.html#ch12"><span class="chnum">Ch 12</span> Variance Functions — V(μ) = φμ<sup>p</sup></a>
+    <a href="Part2_Distributions_Tweedie.html#ch13"><span class="chnum">Ch 13</span> Overdispersion & Solutions</a>
+    <a href="Part2_Distributions_Tweedie.html#ch14"><span class="chnum">Ch 14</span> Distribution Summary & Decision Tree</a>
+  </div>
+</div>
+
+<!-- PART 3 -->
+<div class="part" style="border-color:#27ae60;">
+  <h2><a href="Part3_GLM.html">Part 3: GLM Deep Dive</a></h2>
+  <div class="desc">
+    <span class="tag tag-g">INTERMEDIATE</span> The three components of a GLM. Link functions. Coefficients & relativities. Offsets & exposures. Dummy coding. Feature engineering. Deviance & residuals. Variable selection.
+  </div>
+  <div class="ch-list">
+    <a href="Part3_GLM.html#ch15"><span class="chnum">Ch 15</span> The Three Components of a GLM</a>
+    <a href="Part3_GLM.html#ch16"><span class="chnum">Ch 16</span> Link Functions — Identity, Log, Logit</a>
+    <a href="Part3_GLM.html#ch17"><span class="chnum">Ch 17</span> Coefficients & Relativities</a>
+    <a href="Part3_GLM.html#ch18"><span class="chnum">Ch 18</span> Offsets & Exposures</a>
+    <a href="Part3_GLM.html#ch19"><span class="chnum">Ch 19</span> Categorical Variables & Dummy Coding</a>
+    <a href="Part3_GLM.html#ch20"><span class="chnum">Ch 20</span> Feature Engineering for Insurance</a>
+    <a href="Part3_GLM.html#ch21"><span class="chnum">Ch 21</span> Deviance & Residuals</a>
+    <a href="Part3_GLM.html#ch22"><span class="chnum">Ch 22</span> Variable Selection</a>
+  </div>
+</div>
+
+<!-- PART 4 -->
+<div class="part" style="border-color:#f39c12;">
+  <h2><a href="Part4_GAM_Advanced.html">Part 4: GAM & Advanced Topics</a></h2>
+  <div class="desc">
+    <span class="tag tag-o">ADVANCED</span> GAMs, splines & basis functions, smoothing parameters, one-way analysis, cross-validation, Lorenz curves & Gini, regularization, ML comparison, BAM for big data.
+  </div>
+  <div class="ch-list">
+    <a href="Part4_GAM_Advanced.html#ch23"><span class="chnum">Ch 23</span> GAM — Why Straight Lines Aren't Enough</a>
+    <a href="Part4_GAM_Advanced.html#ch24"><span class="chnum">Ch 24</span> How Splines Work — Step by Step</a>
+    <a href="Part4_GAM_Advanced.html#ch25"><span class="chnum">Ch 25</span> Smoothing Parameters & Penalization</a>
+    <a href="Part4_GAM_Advanced.html#ch26"><span class="chnum">Ch 26</span> One-Way Analysis & Partial Dependence</a>
+    <a href="Part4_GAM_Advanced.html#ch27"><span class="chnum">Ch 27</span> Cross-Validation — The Honest Test</a>
+    <a href="Part4_GAM_Advanced.html#ch28"><span class="chnum">Ch 28</span> Lorenz Curves & Gini Coefficient</a>
+    <a href="Part4_GAM_Advanced.html#ch29"><span class="chnum">Ch 29</span> Lift Charts & Decile Analysis</a>
+    <a href="Part4_GAM_Advanced.html#ch30"><span class="chnum">Ch 30</span> Regularization — Ridge, Lasso & Elastic Net</a>
+    <a href="Part4_GAM_Advanced.html#ch31"><span class="chnum">Ch 31</span> ML for Pricing — GBMs & Random Forests</a>
+    <a href="Part4_GAM_Advanced.html#ch32"><span class="chnum">Ch 32</span> BAM vs GAM — Scaling for Big Data</a>
+  </div>
+</div>
+
+<!-- PART 5 -->
+<div class="part" style="border-color:#e74c3c;">
+  <h2><a href="Part5_Practice.html">Part 5: Real-World Practice</a></h2>
+  <div class="desc">
+    <span class="tag tag-r">EXPERT</span> Rating tables, large loss capping, ILFs, IBNR & development, credibility, model deployment, end-to-end worked example, and 25 interview questions (Easy/Medium/Hard).
+  </div>
+  <div class="ch-list">
+    <a href="Part5_Practice.html#ch33"><span class="chnum">Ch 33</span> Rating Tables & How Underwriters Use Models</a>
+    <a href="Part5_Practice.html#ch34"><span class="chnum">Ch 34</span> Large Losses — Capping, Truncation & ILFs</a>
+    <a href="Part5_Practice.html#ch35"><span class="chnum">Ch 35</span> IBNR & Development Factors</a>
+    <a href="Part5_Practice.html#ch36"><span class="chnum">Ch 36</span> Credibility & Shrinkage</a>
+    <a href="Part5_Practice.html#ch37"><span class="chnum">Ch 37</span> Model Deployment & Monitoring</a>
+    <a href="Part5_Practice.html#ch38"><span class="chnum">Ch 38</span> End-to-End Worked Example</a>
+    <a href="Part5_Practice.html#ch39"><span class="chnum">Ch 39</span> Common Pitfalls & Best Practices</a>
+    <a href="Part5_Practice.html#ch40"><span class="chnum">Ch 40</span> Interview Questions — Easy, Medium & Hard</a>
+  </div>
+</div>
+
+</div>
+<div style="text-align:center;padding:30px;color:var(--lt);font-size:.85em;">Insurance Pricing Modelling Complete Course | Built for Ayush Sharma | 2025</div>
+</body>
+</html>

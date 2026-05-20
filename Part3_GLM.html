@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Part 3: GLM Deep Dive — Insurance Pricing Course</title>
+<style>
+:root{--p:#1a5276;--a:#2980b9;--g:#27ae60;--r:#e74c3c;--o:#f39c12;--bg:#f4f6f9;--c:#fff;--t:#2c3e50;--lt:#7f8c8d;--bd:#dee2e6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t);line-height:1.75;font-size:17px}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 35px}
+.hero{background:linear-gradient(135deg,#0b3d5b 0%,#1a5276 30%,#2980b9 70%,#1abc9c 100%);color:#fff;padding:50px 30px;text-align:center}
+.hero h1{font-size:2.5em;margin-bottom:8px;text-shadow:2px 2px 6px rgba(0,0,0,.4)}
+.hero .sub{opacity:.85;font-size:1.1em;max-width:700px;margin:0 auto}
+.hero .parttag{display:inline-block;background:rgba(255,255,255,.2);padding:6px 22px;border-radius:20px;margin-top:15px;font-weight:700}
+nav.breadcrumb{background:#fff;padding:12px 35px;font-size:.9em;border-bottom:1px solid var(--bd)}
+nav.breadcrumb a{color:var(--a);text-decoration:none} nav.breadcrumb a:hover{text-decoration:underline}
+.ch{background:var(--c);border-radius:14px;padding:40px 45px;margin:30px 0;box-shadow:0 2px 15px rgba(0,0,0,.06);border-left:6px solid var(--a);position:relative}
+.ch h2{color:var(--p);font-size:1.8em;margin-bottom:5px;padding-bottom:12px;border-bottom:2px solid #eee}
+.ch h3{color:var(--a);margin:28px 0 12px;font-size:1.35em}
+.ch h4{color:#34495e;margin:22px 0 10px;font-size:1.1em}
+.ch p,.ch li{margin:8px 0}.ch ul,.ch ol{padding-left:25px}
+.box{border-radius:10px;padding:18px 22px;margin:18px 0;border-left:5px solid}
+.eli5{background:#fef9e7;border-color:#f1c40f}.eli5::before{content:"🧒 Like You're 5: ";font-weight:700}
+.key{background:#eaf2f8;border-color:var(--a)}.key::before{content:"🔑 Key Insight: ";font-weight:700}
+.form{background:#f4ecf7;border-color:#8e44ad}.form::before{content:"📐 Formula: ";font-weight:700;font-family:'Segoe UI',sans-serif}
+.warn{background:#fdedec;border-color:var(--r)}.warn::before{content:"⚠️ Watch Out: ";font-weight:700}
+.ok{background:#eafaf1;border-color:var(--g)}.ok::before{content:"✅ ";font-weight:700}
+.think{background:#fdf2e9;border-color:#e67e22}.think::before{content:"🤔 Think About It: ";font-weight:700}
+.real{background:#e8f6f3;border-color:#16a085}.real::before{content:"🏢 Real World: ";font-weight:700}
+table{width:100%;border-collapse:collapse;margin:15px 0;font-size:.95em}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--bd)}
+th{background:var(--p);color:#fff;font-weight:600}
+tr:nth-child(even){background:#f8f9fa}tr:hover{background:#eaf2f8}
+.diagram{display:flex;align-items:center;justify-content:center;gap:12px;margin:25px 0;flex-wrap:wrap}
+.dbox{padding:16px 22px;border-radius:12px;text-align:center;font-weight:600;min-width:120px;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+.darr{font-size:2em;color:var(--lt)}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}
+.ccard{border-radius:12px;padding:20px;border:2px solid}.ccard h4{margin-top:0}
+.ccard.good{border-color:var(--g);background:#f0faf3}
+.ccard.bad{border-color:var(--r);background:#fdf0ef}
+pre{background:#2c3e50;color:#ecf0f1;padding:18px 22px;border-radius:10px;overflow-x:auto;margin:15px 0;line-height:1.5;font-size:.88em}
+pre code{background:none;padding:0;color:inherit}
+code{background:#ecf0f1;padding:2px 6px;border-radius:4px;font-family:'Cascadia Code','Consolas',monospace;font-size:.9em}
+.tag{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.8em;font-weight:600;margin:2px}
+.tag-b{background:#d6eaf8;color:#2471a3}.tag-g{background:#d5f5e3;color:#1e8449}
+.tag-r{background:#fadbd8;color:#c0392b}.tag-p{background:#e8daef;color:#6c3483}
+.highlight{background:linear-gradient(120deg,#ffeaa7 0%,#fdcb6e 100%);padding:2px 5px;border-radius:3px}
+.svg-chart{margin:20px auto;display:block}
+[id]{scroll-margin-top:20px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin:20px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}
+.gcard{border:2px solid var(--bd);border-radius:12px;padding:20px;text-align:center}
+.gcard .icon{font-size:2.5em;margin:8px 0}
+.gcard h4{margin:8px 0 5px}
+.step-list{counter-reset:steps}
+.step-list li{counter-increment:steps;list-style:none;padding:12px 15px 12px 55px;margin:8px 0;background:#fff;border-radius:8px;border:1px solid #eee;position:relative}
+.step-list li::before{content:counter(steps);position:absolute;left:12px;top:12px;background:var(--a);color:#fff;width:30px;height:30px;border-radius:50%;text-align:center;line-height:30px;font-weight:700;font-size:.9em}
+.flow{display:flex;align-items:stretch;gap:0;margin:22px 0;flex-wrap:wrap;justify-content:center}
+.fstep{padding:14px 18px;text-align:center;border-radius:10px;min-width:120px;font-size:.9em;display:flex;flex-direction:column;justify-content:center}
+.fstep strong{display:block;margin-bottom:3px}
+.farr{display:flex;align-items:center;font-size:1.5em;color:#bdc3c7;padding:0 5px}
+.nav-footer{display:flex;justify-content:space-between;padding:30px 0;margin-top:30px;border-top:2px solid var(--bd)}
+.nav-footer a{color:var(--a);text-decoration:none;font-weight:600;font-size:1.1em}
+.nav-footer a:hover{text-decoration:underline}
+@media print{.ch{break-inside:avoid}}
+@media(max-width:768px){.grid3{grid-template-columns:1fr}.compare,.grid2{grid-template-columns:1fr}.ch{padding:25px 20px}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Insurance Pricing Modelling</h1>
+  <div class="sub">The GLM Framework — Link Functions, Coefficients, Relativities & Diagnostics</div>
+  <div class="parttag">PART 3 of 5: GLM DEEP DIVE</div>
+</div>
+
+<nav class="breadcrumb">
+  <a href="index.html">🏠 Course Home</a> &gt;
+  <a href="Part2_Distributions_Tweedie.html">Part 2</a> &gt;
+  <strong>Part 3: GLM Deep Dive</strong> &gt; Chapters 15–22
+</nav>
+
+<div class="wrap">
+
+<!-- ═══════════════════ CHAPTER 15 ═══════════════════ -->
+<div class="ch" id="ch15">
+<h2>Chapter 15: The Three Components of a GLM</h2>
+
+<div class="box eli5">
+Linear regression is like a vending machine: you put in features (coins), it adds them up, and spits out a prediction. A GLM is a <em>fancier</em> vending machine with three customizable parts: (1) what the output looks like (distribution), (2) how to connect the features to the output (link function), and (3) the actual recipe of features (linear predictor).
+</div>
+
+<h3>Component 1: The Random Component (Distribution)</h3>
+<p>What kind of data are you modelling? This determines which distribution to use.</p>
+
+<div class="grid3">
+  <div class="gcard" style="border-color:#27ae60;">
+    <div class="icon">📊</div>
+    <h4>1. Distribution</h4>
+    <p><strong>The shape of randomness</strong></p>
+    <p>Normal? Poisson? Gamma? Tweedie?</p>
+    <p>Determines the variance function V(μ)</p>
+  </div>
+  <div class="gcard" style="border-color:#e67e22;">
+    <div class="icon">🔗</div>
+    <h4>2. Link Function</h4>
+    <p><strong>The connector</strong></p>
+    <p>g(μ) = η</p>
+    <p>Transforms the mean to the linear predictor scale</p>
+  </div>
+  <div class="gcard" style="border-color:#2980b9;">
+    <div class="icon">📐</div>
+    <h4>3. Linear Predictor</h4>
+    <p><strong>The recipe</strong></p>
+    <p>η = β₀ + β₁X₁ + β₂X₂ + ...</p>
+    <p>The combination of your variables</p>
+  </div>
+</div>
+
+<h3>Linear Regression is a Special Case of GLM!</h3>
+<table>
+  <tr><th>Component</th><th>Linear Regression</th><th>Insurance Pricing GLM</th></tr>
+  <tr><td>Distribution</td><td>Normal</td><td>Tweedie (p=1.5)</td></tr>
+  <tr><td>Link function</td><td>Identity: g(μ) = μ</td><td>Log: g(μ) = log(μ)</td></tr>
+  <tr><td>Linear predictor</td><td>η = β₀ + β₁X</td><td>η = β₀ + β₁X + offset</td></tr>
+  <tr><td>Prediction</td><td>μ = η (direct)</td><td>μ = e<sup>η</sup> (exponential)</td></tr>
+  <tr><td>Can predict negatives?</td><td style="color:#e74c3c;font-weight:bold;">Yes ❌</td><td style="color:#27ae60;font-weight:bold;">No ✅</td></tr>
+  <tr><td>Effect interpretation</td><td>Additive (+ $500)</td><td>Multiplicative (× 1.5)</td></tr>
+</table>
+
+<div class="box key">
+You already know linear regression. A GLM simply generalizes it by allowing you to change the distribution and the link function. That's the entire idea. Everything else is details.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 16 ═══════════════════ -->
+<div class="ch" id="ch16">
+<h2>Chapter 16: Link Functions — The Heart of the GLM</h2>
+
+<div class="box eli5">
+The link function is like a translator. Your model's brain works in one language (the linear predictor η), but your data speaks another language (the mean μ). The link function translates between them.<br><br>
+<strong>Log link:</strong> μ = e<sup>η</sup> — translates "any number" into "always positive"<br>
+<strong>Identity link:</strong> μ = η — no translation (like linear regression)
+</div>
+
+<h3>The Three Key Link Functions</h3>
+
+<table>
+  <tr><th>Link</th><th>Formula</th><th>Inverse</th><th>Used For</th><th>Key Property</th></tr>
+  <tr><td><strong>Identity</strong></td><td>g(μ) = μ</td><td>μ = η</td><td>Normal (linear regression)</td><td>No transformation</td></tr>
+  <tr style="background:#eaf2f8;font-weight:bold;"><td><strong>Log ⭐</strong></td><td>g(μ) = log(μ)</td><td>μ = e<sup>η</sup></td><td>Poisson, Gamma, Tweedie</td><td>Always positive, multiplicative</td></tr>
+  <tr><td><strong>Logit</strong></td><td>g(μ) = log(μ/(1-μ))</td><td>μ = 1/(1+e<sup>−η</sup>)</td><td>Binomial (yes/no outcomes)</td><td>Output between 0 and 1</td></tr>
+</table>
+
+<h3>The Log Link — Why It's Perfect for Insurance</h3>
+
+<div class="box form">
+<strong>Model (on link scale):</strong> log(E[Claims]) = β₀ + β₁X₁ + β₂X₂ + ...<br><br>
+<strong>Prediction (real scale):</strong> E[Claims] = e<sup>β₀</sup> × e<sup>β₁X₁</sup> × e<sup>β₂X₂</sup> × ...<br><br>
+<strong>See the magic?</strong> On the log scale, effects ADD. On the real scale, they MULTIPLY.
+</div>
+
+<h4>Why multiplication is what we want:</h4>
+
+<div class="flow">
+  <div class="fstep" style="background:#eaf2f8;">
+    <strong>Base Rate</strong><br>e<sup>β₀</sup> = $1,000
+  </div>
+  <div class="farr">×</div>
+  <div class="fstep" style="background:#fef9e7;">
+    <strong>Exposure</strong><br>e<sup>β₁X₁</sup> = 5.1×
+  </div>
+  <div class="farr">×</div>
+  <div class="fstep" style="background:#fdedec;">
+    <strong>UK</strong><br>e<sup>β₂</sup> = 1.30×
+  </div>
+  <div class="farr">×</div>
+  <div class="fstep" style="background:#e8daef;">
+    <strong>Construct'n</strong><br>e<sup>β₃</sup> = 1.15×
+  </div>
+  <div class="farr">=</div>
+  <div class="fstep" style="background:#d5f5e3;border:2px solid var(--g);">
+    <strong>Premium</strong><br>$7,650
+  </div>
+</div>
+
+<div class="box eli5">
+This is EXACTLY how rating tables work! An underwriter looks up each factor, multiplies them, and gets the premium. The log link makes the model naturally produce this multiplicative structure.
+</div>
+
+<h3>Visual: Identity Link vs Log Link</h3>
+
+<svg class="svg-chart" width="700" height="220" viewBox="0 0 700 220">
+  <text x="180" y="15" text-anchor="middle" font-weight="bold" font-size="12" fill="#2c3e50">Identity Link (Linear Regression)</text>
+  <text x="530" y="15" text-anchor="middle" font-weight="bold" font-size="12" fill="#2c3e50">Log Link (Insurance GLM)</text>
+  
+  <!-- Left: identity link -->
+  <line x1="30" y1="30" x2="30" y2="200" stroke="#bdc3c7" stroke-width="1"/>
+  <line x1="30" y1="200" x2="330" y2="200" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="180" y="215" text-anchor="middle" font-size="9" fill="#7f8c8d">Exposure →</text>
+  <!-- Straight line going through zero -->
+  <line x1="30" y1="170" x2="330" y2="50" stroke="#e74c3c" stroke-width="3"/>
+  <!-- Zero line -->
+  <line x1="30" y1="130" x2="330" y2="130" stroke="#7f8c8d" stroke-width="1" stroke-dasharray="4"/>
+  <text x="335" y="133" font-size="9" fill="#7f8c8d">$0</text>
+  <!-- Negative region -->
+  <rect x="30" y="130" width="90" height="70" fill="#e74c3c" fill-opacity="0.15" rx="3"/>
+  <text x="75" y="165" text-anchor="middle" font-size="10" fill="#e74c3c" font-weight="bold">NEGATIVE!</text>
+  <text x="75" y="180" text-anchor="middle" font-size="9" fill="#e74c3c">predictions</text>
+  
+  <!-- Right: log link -->
+  <line x1="380" y1="30" x2="380" y2="200" stroke="#bdc3c7" stroke-width="1"/>
+  <line x1="380" y1="200" x2="680" y2="200" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="530" y="215" text-anchor="middle" font-size="9" fill="#7f8c8d">Exposure →</text>
+  <!-- Exponential curve -->
+  <path d="M390,190 Q430,188 470,180 Q520,160 560,120 Q600,70 650,30" fill="none" stroke="#27ae60" stroke-width="3"/>
+  <!-- Zero line -->
+  <line x1="380" y1="195" x2="680" y2="195" stroke="#7f8c8d" stroke-width="1" stroke-dasharray="4"/>
+  <text x="685" y="198" font-size="9" fill="#7f8c8d">$0</text>
+  <!-- Always above zero -->
+  <text x="530" y="185" text-anchor="middle" font-size="10" fill="#27ae60" font-weight="bold">Always positive! ✅</text>
+</svg>
+
+<h3>The Canonical Link</h3>
+<p>Each distribution has a "default" link function (the canonical link). You CAN use different links, but the canonical link has nice mathematical properties:</p>
+
+<table>
+  <tr><th>Distribution</th><th>Canonical Link</th><th>Practical Link in Insurance</th></tr>
+  <tr><td>Normal</td><td>Identity</td><td>Identity</td></tr>
+  <tr><td>Poisson</td><td><strong>Log ✅</strong></td><td>Log ✅ (same!)</td></tr>
+  <tr><td>Gamma</td><td>Reciprocal (1/μ)</td><td><strong>Log</strong> (not canonical, but practical)</td></tr>
+  <tr><td>Tweedie</td><td>Power (μ<sup>1-p</sup>)</td><td><strong>Log</strong> (not canonical, but universal in insurance)</td></tr>
+</table>
+
+<div class="box real">
+In insurance, we almost always use the <strong>log link</strong>, even when it's not the canonical link for that distribution. The reason: multiplicative relativities are what underwriters need, and the log link provides them directly.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 17 ═══════════════════ -->
+<div class="ch" id="ch17">
+<h2>Chapter 17: Coefficients & Relativities — Reading GLM Output</h2>
+
+<div class="box eli5">
+When the model says "β_UK = 0.26", it doesn't mean "add $0.26." It means "UK is e<sup>0.26</sup> = 1.30 times the base." That 1.30 is the <strong>relativity</strong>. It's the single most important number for pricing — it goes directly into the rating table.
+</div>
+
+<h3>From Coefficients to Relativities</h3>
+
+<div class="box form">
+For a log-link GLM:<br><br>
+<strong>Coefficient β:</strong> The model's raw output. On the log scale.<br>
+<strong>Relativity = e<sup>β</sup>:</strong> The multiplicative factor. On the real scale.<br><br>
+If β = 0 → Relativity = e⁰ = 1.00 (no effect — this is the <strong>base level</strong>)<br>
+If β > 0 → Relativity > 1 (more expensive than base)<br>
+If β < 0 → Relativity < 1 (cheaper than base)
+</div>
+
+<h3>Example: Reading Your Model Output</h3>
+
+<pre><code>                           Coefficient (β)    e^β (Relativity)
+Intercept                     5.2345              —
+log10(Exposure)               1.6300            5.12 (per unit log10)
+country = United Kingdom      0.2624            1.30
+country = Canada             -0.1054            0.90
+country = Asia                0.1823            1.20
+country = Others              0.3988            1.49
+sub_trade = Other            -0.1508            0.86
+isBinder = totten             0.0953            1.10
+isBinder = pen               -0.0412            0.96</code></pre>
+
+<h3>How to Read Each Line</h3>
+<table>
+  <tr><th>Variable</th><th>Level</th><th>β</th><th>e<sup>β</sup></th><th>Plain English</th></tr>
+  <tr><td>Intercept</td><td>—</td><td>5.23</td><td>e<sup>5.23</sup> = $187</td><td>Base rate (AU, Construction, not binder, 1yr, exposure=1)</td></tr>
+  <tr><td>log₁₀(Exp)</td><td>Continuous</td><td>1.63</td><td>5.12</td><td>Every 10× exposure → 5.12× claims</td></tr>
+  <tr><td>Country</td><td>AU (base)</td><td>0</td><td>1.00</td><td>Reference level — everything compared to this</td></tr>
+  <tr><td>Country</td><td>UK</td><td>+0.26</td><td>1.30</td><td>UK is 30% more expensive than AU</td></tr>
+  <tr><td>Country</td><td>Canada</td><td>−0.11</td><td>0.90</td><td>Canada is 10% cheaper than AU</td></tr>
+  <tr><td>Sub-trade</td><td>Construction (base)</td><td>0</td><td>1.00</td><td>Reference</td></tr>
+  <tr><td>Sub-trade</td><td>Other</td><td>−0.15</td><td>0.86</td><td>Other contractors are 14% cheaper</td></tr>
+</table>
+
+<div class="box eli5">
+<strong>Prediction example:</strong> UK construction company, $10M exposure, 1-year policy, not a binder:<br><br>
+Premium = e<sup>5.23</sup> × 5.12<sup>log₁₀(10M)=7</sup> × 1.30 × 1.00 × 1.00<br>
+= $187 × ... (the math works out to the model's prediction)
+<br><br>
+<em>Actually, the exposure coefficient works like this:</em> E[Y] = e<sup>5.23 + 1.63 × 7 + 0.26</sup> = e<sup>16.90</sup> ≈ $21.9M ... which gets divided by 10M to get the rate.
+</div>
+
+<h3>The Base Level — Why One Category "Disappears"</h3>
+
+<div class="box think">
+If country has 5 levels (AU, UK, CA, Asia, Others), the model only shows 4 coefficients. Where's Australia?<br><br>
+<strong>Answer:</strong> Australia is the <strong>base level</strong> (reference category). Its coefficient is 0, which means its relativity is e⁰ = 1.00. All other countries are measured RELATIVE to Australia. This is called <strong>dummy coding</strong> or <strong>treatment coding</strong>.
+</div>
+
+<h3>Changing the Base Level</h3>
+<p>The choice of base level doesn't change the predictions — it only changes how you read the coefficients. But it matters for communication:</p>
+<pre><code># R: Change base level to UK
+df$country <- relevel(factor(df$country), ref = "United Kingdom")
+
+# Now UK has coefficient 0, and Australia would have a NEGATIVE coefficient
+# (meaning Australia is cheaper than UK)</code></pre>
+
+<div class="box key">
+<strong>Best practice:</strong> Choose the base level that makes business sense. In your case, Australia is the largest portfolio → natural base. All relativities then show "how much more/less than Australia."
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 18 ═══════════════════ -->
+<div class="ch" id="ch18">
+<h2>Chapter 18: Offsets & Exposures in GLMs</h2>
+
+<div class="box eli5">
+An offset is like telling the model: "I KNOW this relationship is proportional. Don't waste time estimating it — just lock it in." The most common offset is policy duration: a 2-year policy should have exactly 2× the expected claims of a 1-year policy. Not 1.97×, not 2.03× — exactly 2×.
+</div>
+
+<h3>What Is an Offset?</h3>
+<div class="box form">
+<strong>Without offset:</strong> log(E[Y]) = β₀ + β₁X₁ + <span class="highlight">β_dur × log(Duration)</span><br>
+→ Model estimates β_dur ≈ 1 (wastes a degree of freedom)<br><br>
+<strong>With offset:</strong> log(E[Y]) = β₀ + β₁X₁ + <span class="highlight">1 × log(Duration)</span><br>
+→ Coefficient FIXED at 1 (no estimation needed)<br><br>
+Which means: E[Y] = e<sup>β₀ + β₁X₁</sup> × Duration
+</div>
+
+<h3>Common Offsets in Insurance</h3>
+<table>
+  <tr><th>Offset</th><th>Why</th><th>Code</th></tr>
+  <tr><td><strong>log(Policy Duration)</strong></td><td>2-year policy = 2× risk</td><td><code>offset = log(PolicyDurationYear)</code></td></tr>
+  <tr><td><strong>log(Earned Exposure)</strong></td><td>Bigger company = proportionally more risk</td><td><code>offset = log(TradeExposureUSD)</code></td></tr>
+  <tr><td><strong>log(Number of Vehicles)</strong></td><td>Motor: more cars = more accidents</td><td><code>offset = log(n_vehicles)</code></td></tr>
+</table>
+
+<div class="box warn">
+<strong>When NOT to use an offset:</strong> Only use an offset when the relationship is truly proportional. If doubling the exposure doesn't exactly double the expected claims (it might do more or less), then exposure should be a regular variable, not an offset. In your construction model, duration is an offset but exposure is a regular variable (with a spline).
+</div>
+
+<h3>Your Model's Offset in Detail</h3>
+<pre><code># R code
+bam(claims ~ s(log10(exposure), k=5) + country + trade + binder,
+    family = tw(p=1.5),
+    offset = log(PolicyDurationYear))  # ← OFFSET
+
+# This means:
+# log(E[claims]) = β₀ + f(log10exp) + β_country + ... + log(Duration)
+# E[claims] = [base × exposure_factor × country_factor × ...] × Duration</code></pre>
+
+<div class="box key">
+The offset separates the <strong>rate</strong> (claims per year) from the <strong>volume</strong> (how many years of exposure). This is fundamental — your model estimates the RATE, and the offset scales it by duration.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 19 ═══════════════════ -->
+<div class="ch" id="ch19">
+<h2>Chapter 19: Categorical Variables — Dummy Coding & Factor Levels</h2>
+
+<div class="box eli5">
+Your model can't understand words like "Australia" or "United Kingdom." It only understands numbers. So we convert each category into a set of 0/1 flags. "Is this policy from UK?" → 1 or 0. "Is it from Canada?" → 1 or 0. These flags are called <strong>dummy variables</strong>.
+</div>
+
+<h3>How Dummy Coding Works</h3>
+<p>For a variable with L levels, we create L-1 dummy variables. The missing level is the <strong>base</strong>:</p>
+
+<table>
+  <tr><th>Policy</th><th>Country</th><th>is_UK</th><th>is_CA</th><th>is_Asia</th><th>is_Others</th></tr>
+  <tr><td>P001</td><td>Australia</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+  <tr><td>P002</td><td>UK</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+  <tr><td>P003</td><td>Canada</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+  <tr><td>P004</td><td>Asia</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+  <tr><td>P005</td><td>Others</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+</table>
+
+<div class="box eli5">
+Australia has all zeros → it's the base. Its effect is absorbed into the intercept β₀. Every other country's coefficient measures "how different from Australia?"
+</div>
+
+<h3>Why L-1, Not L Dummies?</h3>
+<div class="box warn">
+If you created a dummy for ALL 5 countries (including Australia), the columns would be perfectly correlated: is_AU + is_UK + is_CA + is_Asia + is_Others = 1 always. This is called <strong>multicollinearity</strong> and breaks the model. Dropping one level (the base) fixes this.
+</div>
+
+<h3>Handling Variables With Many Levels</h3>
+<p>NAICS codes might have 200+ levels. You can't give each one its own coefficient (not enough data). Solutions:</p>
+
+<ol class="step-list">
+  <li><strong>Group similar levels:</strong> Combine all plumbing codes into "Plumbing." Your data groups 70 countries into 5 groups.</li>
+  <li><strong>Keep only significant levels:</strong> Test which levels are significantly different from the base. Merge insignificant ones into "Other."</li>
+  <li><strong>Credibility threshold:</strong> Only keep levels with ≥ N claims (e.g., N=20). Levels with fewer claims → "Other."</li>
+  <li><strong>Regularization:</strong> Use shrinkage (Ridge/Lasso) to pull small-sample coefficients toward zero.</li>
+</ol>
+
+<div class="box real">
+In your construction model, you grouped:<br>
+• 70 countries → 5 groups (AU, UK, CA, Asia, Others)<br>
+• Multiple trades → 2 groups (Construction, Other)<br>
+• 8 sources → 3 binder categories (not_binder, totten, pen)<br>
+This was driven by volume: each group needs enough claims to estimate a stable coefficient.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 20 ═══════════════════ -->
+<div class="ch" id="ch20">
+<h2>Chapter 20: Feature Engineering for Insurance</h2>
+
+<div class="box eli5">
+Your raw data has "revenue = $10,000,000." But the model works better with "log₁₀(revenue) = 7." Transforming raw data into model-ready features is called <strong>feature engineering</strong>. It's often the difference between a bad model and a great one.
+</div>
+
+<h3>The Most Important Transformations</h3>
+
+<h4>1. Log Transform for Exposure</h4>
+<div class="box form">
+<strong>Raw:</strong> Exposure ranges from $100K to $10B (100,000× range)<br>
+<strong>Log₁₀:</strong> log₁₀(Exposure) ranges from 5 to 10 (just 5 units)<br><br>
+This compresses the scale and makes the relationship closer to linear (on the log-log scale).
+</div>
+
+<div class="box eli5">
+Think about earthquake intensity: magnitude 5 vs magnitude 7 doesn't sound like much, but it's 100× different in energy. Using the Richter scale (which is log₁₀) makes comparisons easier. Same with exposure.
+</div>
+
+<h4>2. Grouping Categorical Variables</h4>
+<table>
+  <tr><th>Raw Variable</th><th>Levels</th><th>Grouped Variable</th><th>Levels</th><th>Why</th></tr>
+  <tr><td>domicile_country</td><td>70+</td><td>country_group</td><td>5</td><td>Sparse data per country</td></tr>
+  <tr><td>trade1_naics_code</td><td>200+</td><td>sub_trade</td><td>2-5</td><td>Similar risks grouped</td></tr>
+  <tr><td>source</td><td>8</td><td>is_binder</td><td>3</td><td>Business meaning</td></tr>
+</table>
+
+<h4>3. Creating Interaction Terms</h4>
+<div class="box eli5">
+What if the UK is more expensive for small companies but not for large ones? That's an <strong>interaction</strong> between country and exposure. Without an interaction term, the model assumes country has the same effect regardless of company size.
+</div>
+
+<pre><code># R: Add interaction
+bam(claims ~ s(log10exp, k=5) + country + s(log10exp, by=country, k=3)  # ← INTERACTION
+    family = tw(p=1.5), offset = log(Duration))
+
+# The "by=country" creates a DIFFERENT smooth for each country</code></pre>
+
+<div class="box warn">
+<strong>When to add interactions:</strong> Only when you have enough data. Each interaction term needs its own parameters. With 5 countries × 5 knots = 25 extra parameters, you need substantially more claims. In your model with 3,600 claims, simple interactions are OK; complex ones risk overfitting.
+</div>
+
+<h4>4. Creating Derived Variables</h4>
+<table>
+  <tr><th>Derived Variable</th><th>How to Create</th><th>Why</th></tr>
+  <tr><td>Claim frequency</td><td>n_claims / duration</td><td>Standardize to annual basis</td></tr>
+  <tr><td>Rate on exposure</td><td>claims / exposure</td><td>Compare risk across sizes</td></tr>
+  <tr><td>Inflation-adjusted exposure</td><td>exposure × CPI_factor</td><td>Make years comparable</td></tr>
+  <tr><td>Is_large_company</td><td>1 if exposure > $100M</td><td>Flag for special treatment</td></tr>
+</table>
+</div>
+
+<!-- ═══════════════════ CHAPTER 21 ═══════════════════ -->
+<div class="ch" id="ch21">
+<h2>Chapter 21: Deviance & Residuals — How Good Is Your GLM?</h2>
+
+<div class="box eli5">
+After cooking a meal, you taste it. After fitting a model, you check the residuals. Residuals are the "leftovers" — the difference between what actually happened and what the model predicted. If the leftovers look random, the model is good. If there's a pattern, something is wrong.
+</div>
+
+<h3>What Is Deviance?</h3>
+<div class="box form">
+<strong>Deviance = 2 × [log-likelihood(saturated model) − log-likelihood(your model)]</strong><br><br>
+The saturated model is the "perfect" model that has one parameter per data point (fits perfectly).<br>
+Deviance measures how far your model is from perfection. <strong>Lower = better.</strong>
+</div>
+
+<div class="box eli5">
+Think of a test where the maximum score is 100 (saturated model). Your model scores 85. The deviance is like the 15 points you missed. Lower deviance = closer to the perfect score.
+</div>
+
+<h3>Types of Residuals in GLMs</h3>
+<table>
+  <tr><th>Residual Type</th><th>Formula</th><th>What It Tells You</th><th>When to Use</th></tr>
+  <tr><td><strong>Raw (response)</strong></td><td>y − μ̂</td><td>Actual minus predicted, in original units</td><td>Quick sanity check</td></tr>
+  <tr><td><strong>Pearson</strong></td><td>(y − μ̂) / √V(μ̂)</td><td>Standardized by variance function</td><td>Checking variance assumption</td></tr>
+  <tr><td><strong>Deviance</strong></td><td>sign(y − μ̂) × √dᵢ</td><td>Contribution to total deviance</td><td>Most commonly used ⭐</td></tr>
+  <tr><td><strong>Anscombe</strong></td><td>Transformed to be ~Normal</td><td>Should look like Normal residuals</td><td>Diagnostic plots</td></tr>
+</table>
+
+<h3>The 4 Key Residual Plots</h3>
+
+<div class="grid2">
+  <div class="gcard" style="border-color:#2980b9;">
+    <h4>1. Residuals vs Fitted</h4>
+    <p>Plot residuals against predicted values</p>
+    <p><strong>Want:</strong> Random scatter around 0, no pattern</p>
+    <p><strong>Bad sign:</strong> Funnel shape, curve, clusters</p>
+  </div>
+  <div class="gcard" style="border-color:#27ae60;">
+    <h4>2. Q-Q Plot</h4>
+    <p>Compare residual quantiles to Normal quantiles</p>
+    <p><strong>Want:</strong> Points on the diagonal line</p>
+    <p><strong>Bad sign:</strong> S-curve (heavy tails), banana shape</p>
+  </div>
+  <div class="gcard" style="border-color:#e67e22;">
+    <h4>3. Residuals vs Each Predictor</h4>
+    <p>Plot residuals against each X variable</p>
+    <p><strong>Want:</strong> Random scatter — no remaining pattern</p>
+    <p><strong>Bad sign:</strong> Curve = missing non-linearity → need GAM</p>
+  </div>
+  <div class="gcard" style="border-color:#e74c3c;">
+    <h4>4. Cook's Distance</h4>
+    <p>Identify influential observations</p>
+    <p><strong>Want:</strong> All points with low Cook's D</p>
+    <p><strong>Bad sign:</strong> One point with huge Cook's D → investigate</p>
+  </div>
+</div>
+
+<pre><code># R: Quick diagnostic plots
+par(mfrow = c(2,2))
+plot(model)  # Produces the 4 standard plots
+
+# Python:
+import statsmodels.api as sm
+fig = sm.graphics.plot_regress_exog(model, 'log10_exposure')
+plt.show()</code></pre>
+
+<div class="box key">
+<strong>Most important check for your model:</strong> Plot deviance residuals vs log₁₀(exposure). If you see a curve → the GLM's straight line isn't enough → you need a GAM (spline). This is exactly what happened in your model.
+</div>
+</div>
+
+<!-- ═══════════════════ CHAPTER 22 ═══════════════════ -->
+<div class="ch" id="ch22">
+<h2>Chapter 22: Variable Selection — What Goes in the Model?</h2>
+
+<div class="box eli5">
+You have 255 columns in your data. You can't put all of them in the model (it would overfit and be uninterpretable). Choosing the right variables is like packing a suitcase — take what you need, leave the rest behind.
+</div>
+
+<h3>The Variable Selection Process</h3>
+
+<ol class="step-list">
+  <li><strong>Start with domain knowledge:</strong> What SHOULD affect pricing? Exposure, country, trade, duration — these are obvious. Include them.</li>
+  <li><strong>Check one-way plots:</strong> For each candidate variable, plot actual loss rate vs the variable. Is there a signal?</li>
+  <li><strong>Fit the model with each variable:</strong> Does adding it improve AIC? By how much?</li>
+  <li><strong>Check statistical significance:</strong> Is the coefficient's p-value < 0.05?</li>
+  <li><strong>Cross-validate:</strong> Does the variable improve out-of-sample performance?</li>
+  <li><strong>Business sense:</strong> Can you explain why this variable affects the price? (Important for regulatory and underwriter buy-in)</li>
+</ol>
+
+<h3>Methods for Variable Selection</h3>
+<table>
+  <tr><th>Method</th><th>How It Works</th><th>Pros</th><th>Cons</th></tr>
+  <tr><td><strong>Forward Selection</strong></td><td>Start empty, add one variable at a time (best AIC improvement)</td><td>Simple, fast</td><td>Can miss variable combinations</td></tr>
+  <tr><td><strong>Backward Elimination</strong></td><td>Start with everything, remove one at a time (least AIC impact)</td><td>Considers all variables together</td><td>Slow with many variables</td></tr>
+  <tr><td><strong>Stepwise</strong></td><td>Combination: add and remove at each step</td><td>Flexible</td><td>Can be unstable</td></tr>
+  <tr><td><strong>Cross-Validation ⭐</strong></td><td>Test each formula on held-out data</td><td>Honest out-of-sample metric</td><td>Computationally expensive</td></tr>
+  <tr><td><strong>Regularization</strong></td><td>Fit all variables but shrink small effects toward zero</td><td>Automatic, handles many variables</td><td>Need to tune the penalty</td></tr>
+</table>
+
+<div class="box real">
+<strong>Your approach at QBE:</strong> You tested 20+ candidate formulas using 20-fold cross-validation. For each formula, you computed Gini, AIC, deviance, and RMSE on held-out data. You picked the formula with the best average CV metrics. This is the gold standard.
+</div>
+
+<h3>Decision Framework: Include or Exclude?</h3>
+
+<svg class="svg-chart" width="600" height="300" viewBox="0 0 600 300">
+  <text x="300" y="18" text-anchor="middle" font-weight="bold" font-size="13" fill="#2c3e50">Should I Include This Variable?</text>
+  
+  <!-- Root -->
+  <rect x="200" y="35" width="200" height="30" rx="8" fill="#2c3e50"/>
+  <text x="300" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Does it improve AIC by > 2?</text>
+  
+  <!-- No branch -->
+  <line x1="240" y1="65" x2="120" y2="95" stroke="#e74c3c" stroke-width="2"/>
+  <text x="170" y="82" font-size="10" fill="#e74c3c" font-weight="bold">No</text>
+  <rect x="30" y="95" width="180" height="25" rx="6" fill="#fadbd8"/>
+  <text x="120" y="113" text-anchor="middle" font-size="11" fill="#c0392b" font-weight="bold">❌ EXCLUDE</text>
+  
+  <!-- Yes branch -->
+  <line x1="360" y1="65" x2="430" y2="95" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="82" font-size="10" fill="#27ae60" font-weight="bold">Yes</text>
+  <rect x="350" y="95" width="200" height="30" rx="8" fill="#2c3e50"/>
+  <text x="450" y="115" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Does it make business sense?</text>
+  
+  <!-- No business sense -->
+  <line x1="400" y1="125" x2="320" y2="160" stroke="#e74c3c" stroke-width="2"/>
+  <text x="350" y="145" font-size="10" fill="#e74c3c" font-weight="bold">No</text>
+  <rect x="230" y="160" width="180" height="30" rx="6" fill="#fef9e7"/>
+  <text x="320" y="180" text-anchor="middle" font-size="10" fill="#b7950b" font-weight="bold">⚠️ Investigate (maybe spurious)</text>
+  
+  <!-- Yes business sense -->
+  <line x1="500" y1="125" x2="530" y2="160" stroke="#27ae60" stroke-width="2"/>
+  <text x="520" y="145" font-size="10" fill="#27ae60" font-weight="bold">Yes</text>
+  <rect x="440" y="160" width="180" height="30" rx="8" fill="#2c3e50"/>
+  <text x="530" y="180" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Does CV improve?</text>
+  
+  <!-- Final yes -->
+  <line x1="560" y1="190" x2="560" y2="220" stroke="#27ae60" stroke-width="2"/>
+  <rect x="470" y="220" width="180" height="25" rx="6" fill="#d5f5e3"/>
+  <text x="560" y="238" text-anchor="middle" font-size="11" fill="#1e8449" font-weight="bold">✅ INCLUDE</text>
+  
+  <!-- Final no -->
+  <line x1="480" y1="190" x2="400" y2="220" stroke="#e74c3c" stroke-width="2"/>
+  <rect x="310" y="220" width="180" height="25" rx="6" fill="#fadbd8"/>
+  <text x="400" y="238" text-anchor="middle" font-size="10" fill="#c0392b" font-weight="bold">❌ Overfitting risk — EXCLUDE</text>
+</svg>
+
+<div class="box key">
+<strong>Rule of thumb for insurance pricing:</strong> A good pricing model has 5–15 variables. More than that and you're overfitting. Less than 5 and you're probably missing important risk factors. Your QBE model has 4 variables (exposure, country, trade, binder) — lean and focused.
+</div>
+</div>
+
+<!-- NAV FOOTER -->
+<div class="nav-footer">
+  <a href="Part2_Distributions_Tweedie.html">← Part 2: Distributions</a>
+  <span style="color:var(--lt);">Part 3 of 5: GLM Deep Dive</span>
+  <a href="Part4_GAM_Advanced.html">Part 4: GAM & Advanced →</a>
+</div>
+
+</div>
+<div style="text-align:center;padding:30px;color:var(--lt);font-size:.85em;">Insurance Pricing Modelling Complete Course | Built for Ayush Sharma</div>
+</body>
+</html>
