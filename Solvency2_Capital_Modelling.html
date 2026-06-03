@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solvency II Capital Modelling — From Pricing to SCR</title>
+<style>
+:root{--p:#1a5276;--a:#2980b9;--g:#27ae60;--r:#e74c3c;--o:#f39c12;--bg:#f4f6f9;--c:#fff;--t:#2c3e50;--lt:#7f8c8d;--bd:#dee2e6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t);line-height:1.75;font-size:17px}
+.wrap{max-width:1060px;margin:0 auto;padding:20px 35px}
+.hero{background:linear-gradient(135deg,#0d1b2a 0%,#1b2838 25%,#1a5276 50%,#6c3483 80%,#922b21 100%);color:#fff;padding:55px 30px;text-align:center}
+.hero h1{font-size:2.4em;margin-bottom:8px;text-shadow:2px 2px 6px rgba(0,0,0,.5)}
+.hero .sub{opacity:.87;font-size:1.08em;max-width:780px;margin:0 auto}
+.hero .parttag{display:inline-block;background:rgba(255,255,255,.18);padding:6px 22px;border-radius:20px;margin-top:15px;font-weight:700}
+nav.breadcrumb{background:#fff;padding:12px 35px;font-size:.9em;border-bottom:1px solid var(--bd)}
+nav.breadcrumb a{color:var(--a);text-decoration:none} nav.breadcrumb a:hover{text-decoration:underline}
+.ch{background:var(--c);border-radius:14px;padding:40px 45px;margin:30px 0;box-shadow:0 2px 15px rgba(0,0,0,.06);border-left:6px solid var(--a);position:relative}
+.ch h2{color:var(--p);font-size:1.75em;margin-bottom:5px;padding-bottom:12px;border-bottom:2px solid #eee}
+.ch h3{color:var(--a);margin:28px 0 12px;font-size:1.3em}
+.ch h4{color:#34495e;margin:22px 0 10px;font-size:1.08em}
+.ch p,.ch li{margin:8px 0}.ch ul,.ch ol{padding-left:25px}
+.box{border-radius:10px;padding:18px 22px;margin:18px 0;border-left:5px solid}
+.eli5{background:#fef9e7;border-color:#f1c40f}.eli5::before{content:"🧒 Like You're 5: ";font-weight:700}
+.key{background:#eaf2f8;border-color:var(--a)}.key::before{content:"🔑 Key Insight: ";font-weight:700}
+.form{background:#f4ecf7;border-color:#8e44ad}.form::before{content:"📐 Formula: ";font-weight:700}
+.warn{background:#fdedec;border-color:var(--r)}.warn::before{content:"⚠️ Watch Out: ";font-weight:700}
+.ok{background:#eafaf1;border-color:var(--g)}.ok::before{content:"✅ ";font-weight:700}
+.think{background:#fdf2e9;border-color:#e67e22}.think::before{content:"🤔 Think About It: ";font-weight:700}
+.real{background:#e8f6f3;border-color:#16a085}.real::before{content:"🏢 Real World: ";font-weight:700}
+.interview{background:#f9ebea;border-color:#c0392b}.interview::before{content:"🎤 Interview: ";font-weight:700}
+.frm{background:#eee8f5;border-color:#6c3483}.frm::before{content:"📚 FRM Connection: ";font-weight:700}
+table{width:100%;border-collapse:collapse;margin:15px 0;font-size:.92em}
+th,td{padding:9px 12px;text-align:right;border:1px solid var(--bd)}
+th{background:var(--p);color:#fff;font-weight:600;text-align:center}
+td:first-child,th:first-child{text-align:left;font-weight:600}
+tr:nth-child(even){background:#f8f9fa}
+pre{background:#1e1e1e;color:#d4d4d4;padding:20px 24px;border-radius:10px;overflow-x:auto;margin:15px 0;line-height:1.6;font-size:.85em;position:relative}
+pre code{background:none;padding:0;color:inherit}
+pre::before{content:attr(data-lang);position:absolute;top:8px;right:12px;font-size:.7em;color:#888;text-transform:uppercase;font-weight:600}
+code{background:#ecf0f1;padding:2px 6px;border-radius:4px;font-family:'Cascadia Code','Consolas',monospace;font-size:.88em}
+.highlight{background:linear-gradient(120deg,#ffeaa7 0%,#fdcb6e 100%);padding:2px 5px;border-radius:3px}
+[id]{scroll-margin-top:20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin:20px 0}
+.gcard{border:2px solid var(--bd);border-radius:12px;padding:20px;text-align:center}
+.gcard .icon{font-size:2.4em;margin:8px 0}
+.gcard h4{margin:8px 0 5px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}
+.ccard{border-radius:12px;padding:20px;border:2px solid}.ccard h4{margin-top:0}
+.ccard.good{border-color:var(--g);background:#f0faf3}
+.ccard.bad{border-color:var(--r);background:#fdf0ef}
+.flow{display:flex;align-items:stretch;gap:0;margin:22px 0;flex-wrap:wrap;justify-content:center}
+.fstep{padding:14px 16px;text-align:center;border-radius:10px;min-width:100px;font-size:.85em;display:flex;flex-direction:column;justify-content:center}
+.fstep strong{display:block;margin-bottom:3px}
+.farr{display:flex;align-items:center;font-size:1.5em;color:#bdc3c7;padding:0 4px}
+.nav-footer{display:flex;justify-content:space-between;padding:30px 0;margin-top:30px;border-top:2px solid var(--bd)}
+.nav-footer a{color:var(--a);text-decoration:none;font-weight:600;font-size:1.1em}
+.nav-footer a:hover{text-decoration:underline}
+@media(max-width:768px){.grid3,.grid2,.compare{grid-template-columns:1fr}.ch{padding:25px 20px}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Solvency II Capital Modelling</h1>
+  <div class="sub">Connecting your FRM Part 1 theory &amp; pricing expertise to insurance capital requirements — VaR, Monte Carlo, aggregate loss distributions, and the SCR</div>
+  <div class="parttag">SUPPLEMENTARY: CAPITAL MODELLING</div>
+</div>
+
+<nav class="breadcrumb">
+  <a href="index.html">🏠 Course Home</a> &gt;
+  <strong>Solvency II Capital Modelling</strong>
+</nav>
+
+<div class="wrap">
+
+<!-- ═══════════════════ SECTION 1 ═══════════════════ -->
+<div class="ch" id="sec1">
+<h2>Section 1: The Big Picture — What Is Capital Modelling?</h2>
+
+<div class="box eli5">
+Insurance companies collect premiums TODAY to pay claims TOMORROW. But what if a catastrophe happens and claims are WAY bigger than expected? The company needs a cash cushion — <strong>capital</strong> — to survive bad years.<br><br>
+<strong>Capital modelling</strong> = figuring out HOW MUCH cash cushion you need.<br>
+<strong>Solvency II</strong> = the European/Australian regulatory framework that tells insurers exactly how to calculate this.
+</div>
+
+<h3>Where Does This Fit in the Insurance World?</h3>
+
+<div class="flow">
+  <div class="fstep" style="background:#eaf2f8;">
+    <strong>Pricing</strong><br>What should we charge?
+  </div>
+  <div class="farr">→</div>
+  <div class="fstep" style="background:#d5f5e3;">
+    <strong>Reserving</strong><br>What do we owe?
+  </div>
+  <div class="farr">→</div>
+  <div class="fstep" style="background:#e8daef;border:3px solid #8e44ad;">
+    <strong>Capital</strong><br>How much buffer?
+  </div>
+  <div class="farr">→</div>
+  <div class="fstep" style="background:#fef9e7;">
+    <strong>Investment</strong><br>Where to put it?
+  </div>
+  <div class="farr">→</div>
+  <div class="fstep" style="background:#fadbd8;">
+    <strong>Performance</strong><br>Did we make money?
+  </div>
+</div>
+
+<div class="box key">
+<strong>Pricing → Capital connection:</strong><br>
+• Pricing asks: "What's the EXPECTED cost?" (mean of loss distribution)<br>
+• Capital asks: "What's the WORST-CASE cost?" (tail of loss distribution)<br><br>
+You already model the distribution in pricing (Frequency × Severity). Capital modelling just asks: "What happens at the 99.5th percentile of that distribution?"
+</div>
+
+<h3>Solvency II in One Page</h3>
+
+<table>
+  <tr><th>Concept</th><th>What It Is</th><th>Your FRM Analogy</th></tr>
+  <tr><td><strong>SCR</strong><br>(Solvency Capital Requirement)</td><td>Capital needed to survive a 1-in-200 year event</td><td>= VaR at 99.5% confidence, 1-year horizon</td></tr>
+  <tr><td><strong>MCR</strong><br>(Minimum Capital Requirement)</td><td>Absolute minimum below which regulator intervenes</td><td>≈ Lower bound (roughly 25-45% of SCR)</td></tr>
+  <tr><td><strong>Own Funds</strong></td><td>Actual capital the company has</td><td>= Equity (assets minus liabilities)</td></tr>
+  <tr><td><strong>Solvency Ratio</strong></td><td>Own Funds / SCR × 100%</td><td>= Capital adequacy ratio. Target: >130%</td></tr>
+  <tr><td><strong>Standard Formula</strong></td><td>Regulator's prescribed formula for SCR</td><td>Like Basel standardized approach</td></tr>
+  <tr><td><strong>Internal Model</strong></td><td>Company's own model (approved by regulator)</td><td>Like Basel IRB approach</td></tr>
+  <tr><td><strong>1-in-200 year</strong></td><td>The 99.5th percentile loss over 1 year</td><td>VaR(99.5%, 1 year)</td></tr>
+</table>
+
+<div class="box frm">
+<strong>Your FRM Part 1 covered:</strong> VaR, Expected Shortfall, confidence levels, holding periods. In Solvency II, the SCR IS a VaR — specifically VaR(99.5%) of the change in net asset value over 1 year. Everything you learned about VaR limitations (not sub-additive, doesn't capture tail shape) applies directly here.
+</div>
+
+<h3>The Key Question Capital Modelling Answers</h3>
+
+<svg width="700" height="200" viewBox="0 0 700 200" style="margin:15px auto;display:block;">
+  <text x="350" y="18" text-anchor="middle" font-weight="bold" font-size="12" fill="#2c3e50">Loss Distribution — Pricing vs Capital View</text>
+  
+  <!-- Distribution curve -->
+  <path d="M80,160 Q120,158 150,150 Q180,130 210,100 Q240,60 280,35 Q310,22 350,20 Q390,22 420,35 Q450,55 480,80 Q510,110 540,135 Q570,150 600,158 Q620,160 650,160" fill="none" stroke="#2980b9" stroke-width="2.5"/>
+  
+  <!-- Shade the mean area -->
+  <line x1="310" y1="20" x2="310" y2="165" stroke="#27ae60" stroke-width="2" stroke-dasharray="5"/>
+  <text x="310" y="180" text-anchor="middle" font-size="10" fill="#27ae60" font-weight="bold">MEAN (Expected Loss)</text>
+  <text x="310" y="193" text-anchor="middle" font-size="9" fill="#27ae60">← PRICING lives here</text>
+  
+  <!-- VaR line -->
+  <line x1="560" y1="20" x2="560" y2="165" stroke="#e74c3c" stroke-width="2.5"/>
+  <rect x="560" y="130" width="90" height="30" fill="#e74c3c" fill-opacity="0.15" stroke="none"/>
+  <text x="560" y="180" text-anchor="middle" font-size="10" fill="#e74c3c" font-weight="bold">99.5th Percentile</text>
+  <text x="560" y="193" text-anchor="middle" font-size="9" fill="#e74c3c">← CAPITAL lives here</text>
+  
+  <!-- Arrow showing SCR -->
+  <line x1="310" y1="12" x2="560" y2="12" stroke="#8e44ad" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="560" y1="12" x2="310" y2="12" stroke="#8e44ad" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="435" y="9" text-anchor="middle" font-size="11" fill="#8e44ad" font-weight="bold">SCR = This distance</text>
+  
+  <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#8e44ad"/></marker></defs>
+</svg>
+
+<div class="box form">
+<strong>SCR (simplified) = VaR(99.5%) of losses over 1 year − Expected Loss</strong><br><br>
+In other words: how much WORSE than average could it get in a really bad year?<br>
+If Expected Loss = $50M and the 99.5th percentile = $120M, then SCR ≈ $70M.
+</div>
+</div>
+
+<!-- ═══════════════════ SECTION 2 ═══════════════════ -->
+<div class="ch" id="sec2">
+<h2>Section 2: Your FRM Concepts Applied to Insurance Capital</h2>
+
+<div class="box frm">
+Here's the direct mapping of everything you studied in FRM Part 1 to insurance capital modelling. You already KNOW the theory — now see where it lands.
+</div>
+
+<table>
+  <tr><th>FRM Part 1 Concept</th><th>Insurance Capital Application</th><th>How You Use It</th></tr>
+  <tr><td><strong>VaR (Value at Risk)</strong></td><td>SCR = VaR(99.5%, 1yr) of net losses</td><td>The entire regulatory capital requirement is a VaR</td></tr>
+  <tr><td><strong>Expected Shortfall (CVaR)</strong></td><td>Used in internal models for tail risk</td><td>ES captures HOW BAD beyond VaR; used for reinsurance decisions</td></tr>
+  <tr><td><strong>Normal Distribution</strong></td><td>Aggregate losses (CLT applies to large portfolios)</td><td>With enough policies, total loss ≈ Normal</td></tr>
+  <tr><td><strong>Poisson Distribution</strong></td><td>Claim frequency modelling</td><td>Number of claims ~ Poisson(λ) — you do this in pricing already</td></tr>
+  <tr><td><strong>Lognormal Distribution</strong></td><td>Claim severity (individual claim sizes)</td><td>Most claims are small, few are huge → right-skewed → lognormal</td></tr>
+  <tr><td><strong>Monte Carlo Simulation</strong></td><td>Simulating 100,000+ scenarios of total loss</td><td>The heart of any internal capital model</td></tr>
+  <tr><td><strong>Copulas</strong></td><td>Modelling dependency between risk types</td><td>Are fire and liability claims correlated? Copulas capture this</td></tr>
+  <tr><td><strong>Extreme Value Theory (EVT)</strong></td><td>Tail of severity distribution</td><td>Modelling the very largest claims (catastrophes)</td></tr>
+  <tr><td><strong>Loss Distributions</strong></td><td>Frequency × Severity = Aggregate Loss</td><td>Compound distribution: S = X₁ + X₂ + ... + X_N where N~Poisson</td></tr>
+  <tr><td><strong>Correlation & Diversification</strong></td><td>Diversification benefit in SCR</td><td>Total SCR < sum of individual SCRs (because risks aren't 100% correlated)</td></tr>
+</table>
+
+<h3>The Aggregate Loss Model — Where Pricing Meets Capital</h3>
+
+<div class="box form">
+<strong>Aggregate Loss S = X₁ + X₂ + ... + X_N</strong><br><br>
+Where:<br>
+• N = number of claims (random) ~ Poisson(λ) or NegBin(r, p) ← <strong>FREQUENCY</strong><br>
+• Xᵢ = size of claim i (random) ~ Lognormal(μ, σ) or Pareto(α, θ) ← <strong>SEVERITY</strong><br>
+• S = total loss for the portfolio (what we need the distribution of)<br><br>
+<strong>In pricing:</strong> E[S] = E[N] × E[X] → the mean = your pure premium<br>
+<strong>In capital:</strong> VaR₉₉.₅%(S) → the 99.5th percentile = what drives SCR
+</div>
+
+<div class="box eli5">
+You already model E[N] and E[X] in pricing (frequency × severity). For capital, you need the FULL DISTRIBUTION of S, not just the mean. You simulate it with Monte Carlo: draw random N, then draw N random claim sizes, sum them up. Do this 100,000 times. Sort the results. The 99.5th percentile is your VaR.
+</div>
+
+<pre data-lang="python"><code># ══════════════════════════════════════════════════════════════
+# AGGREGATE LOSS SIMULATION — The Foundation of Capital Modelling
+# ══════════════════════════════════════════════════════════════
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+np.random.seed(42)
+n_simulations = 100_000
+
+# ─── Parameters (from your PRICING model!) ──────────────
+# These come directly from your GLM/GAM frequency-severity model
+expected_frequency = 150      # Expected claims per year (λ)
+mean_severity = 85_000        # Average claim size ($)
+cv_severity = 2.5             # Coefficient of variation of severity
+
+# Convert to lognormal parameters
+sigma_sev = np.sqrt(np.log(1 + cv_severity**2))
+mu_sev = np.log(mean_severity) - 0.5 * sigma_sev**2
+
+# ─── Monte Carlo Simulation ─────────────────────────────
+aggregate_losses = np.zeros(n_simulations)
+
+for i in range(n_simulations):
+    # Step 1: Draw number of claims (Frequency)
+    n_claims = np.random.poisson(expected_frequency)
+    
+    # Step 2: Draw each claim's size (Severity)
+    if n_claims > 0:
+        claim_sizes = np.random.lognormal(mu_sev, sigma_sev, size=n_claims)
+        aggregate_losses[i] = claim_sizes.sum()
+    else:
+        aggregate_losses[i] = 0
+
+# ─── Results: From Pricing to Capital ───────────────────
+mean_loss = aggregate_losses.mean()
+var_995 = np.percentile(aggregate_losses, 99.5)
+var_99 = np.percentile(aggregate_losses, 99.0)
+es_995 = aggregate_losses[aggregate_losses >= var_995].mean()
+
+print("="*60)
+print("AGGREGATE LOSS DISTRIBUTION — PRICING TO CAPITAL")
+print("="*60)
+print(f"  Expected Loss (Mean):     ${mean_loss:>14,.0f}  ← PRICING uses this")
+print(f"  Std Dev:                  ${aggregate_losses.std():>14,.0f}")
+print(f"  VaR (99.0%):              ${var_99:>14,.0f}")
+print(f"  VaR (99.5%):              ${var_995:>14,.0f}  ← SCR based on this")
+print(f"  Expected Shortfall (99.5):${es_995:>14,.0f}  ← Tail severity")
+print(f"  SCR ≈ VaR - Mean:         ${var_995 - mean_loss:>14,.0f}  ← CAPITAL needed")
+print("="*60)
+print(f"\n  The 1-in-200 year loss is {var_995/mean_loss:.1f}x the expected loss")
+print(f"  You need ${(var_995-mean_loss)/1e6:.1f}M in capital above expected losses")
+</code></pre>
+
+<div class="box key">
+<strong>The bridge from pricing to capital in one sentence:</strong><br>
+"Pricing gives you the MEAN of the aggregate loss distribution. Capital modelling gives you the TAIL."<br><br>
+You use the SAME frequency and severity models from pricing — you just simulate the full distribution instead of taking the expectation.
+</div>
+</div>
+
+<!-- ═══════════════════ SECTION 3 ═══════════════════ -->
+<div class="ch" id="sec3">
+<h2>Section 3: The Solvency II Standard Formula</h2>
+
+<div class="box eli5">
+Not every company builds a full Monte Carlo model. The regulator provides a "standard formula" — a simplified calculation using factors and correlations. Think of it like a quick-and-dirty approximation. Companies can either:<br>
+• Use the standard formula (simpler, less accurate), or<br>
+• Build an internal model (complex, more accurate, requires regulatory approval)
+</div>
+
+<h3>SCR Structure — The Risk Modules</h3>
+
+<svg width="700" height="320" viewBox="0 0 700 320" style="margin:15px auto;display:block;">
+  <text x="350" y="20" text-anchor="middle" font-weight="bold" font-size="13" fill="#2c3e50">Solvency II SCR — Modular Structure</text>
+  
+  <!-- Top level -->
+  <rect x="270" y="35" width="160" height="40" rx="8" fill="#1a5276" stroke="none"/>
+  <text x="350" y="60" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">Total SCR</text>
+  
+  <!-- Lines down -->
+  <line x1="350" y1="75" x2="350" y2="95" stroke="#7f8c8d" stroke-width="1.5"/>
+  <line x1="120" y1="95" x2="580" y2="95" stroke="#7f8c8d" stroke-width="1.5"/>
+  
+  <!-- Main modules -->
+  <rect x="50" y="100" width="130" height="35" rx="6" fill="#2980b9"/>
+  <text x="115" y="122" text-anchor="middle" font-size="9" fill="#fff" font-weight="bold">Market Risk</text>
+  
+  <rect x="200" y="100" width="130" height="35" rx="6" fill="#27ae60"/>
+  <text x="265" y="122" text-anchor="middle" font-size="9" fill="#fff" font-weight="bold">Counterparty Risk</text>
+  
+  <rect x="350" y="100" width="130" height="35" rx="6" fill="#e74c3c"/>
+  <text x="415" y="122" text-anchor="middle" font-size="9" fill="#fff" font-weight="bold">Underwriting Risk</text>
+  
+  <rect x="500" y="100" width="130" height="35" rx="6" fill="#8e44ad"/>
+  <text x="565" y="122" text-anchor="middle" font-size="9" fill="#fff" font-weight="bold">Operational Risk</text>
+  
+  <!-- Lines from each -->
+  <line x1="115" y1="135" x2="115" y2="155" stroke="#7f8c8d"/>
+  <line x1="415" y1="135" x2="415" y2="155" stroke="#7f8c8d"/>
+  
+  <!-- Sub modules for Underwriting -->
+  <line x1="330" y1="155" x2="500" y2="155" stroke="#7f8c8d"/>
+  
+  <rect x="300" y="160" width="110" height="32" rx="5" fill="#fadbd8" stroke="#e74c3c"/>
+  <text x="355" y="180" text-anchor="middle" font-size="8.5" fill="#c0392b" font-weight="bold">Premium Risk</text>
+  
+  <rect x="420" y="160" width="110" height="32" rx="5" fill="#fadbd8" stroke="#e74c3c"/>
+  <text x="475" y="180" text-anchor="middle" font-size="8.5" fill="#c0392b" font-weight="bold">Reserve Risk</text>
+  
+  <!-- Your contribution highlighted -->
+  <rect x="290" y="200" width="250" height="50" rx="8" fill="#fef9e7" stroke="#f39c12" stroke-width="2" stroke-dasharray="5"/>
+  <text x="415" y="220" text-anchor="middle" font-size="10" fill="#e67e22" font-weight="bold">⭐ YOUR CONTRIBUTION</text>
+  <text x="415" y="236" text-anchor="middle" font-size="9" fill="#2c3e50">Pricing feeds Premium Risk</text>
+  <text x="415" y="248" text-anchor="middle" font-size="9" fill="#2c3e50">Reserving feeds Reserve Risk</text>
+  
+  <!-- Sub modules for Market -->
+  <line x1="50" y1="155" x2="180" y2="155" stroke="#7f8c8d"/>
+  <rect x="30" y="160" width="80" height="28" rx="5" fill="#eaf2f8" stroke="#2980b9"/>
+  <text x="70" y="178" text-anchor="middle" font-size="7.5" fill="#1a5276">Interest Rate</text>
+  <rect x="115" y="160" width="80" height="28" rx="5" fill="#eaf2f8" stroke="#2980b9"/>
+  <text x="155" y="178" text-anchor="middle" font-size="7.5" fill="#1a5276">Equity/Spread</text>
+  
+  <!-- Aggregation note -->
+  <text x="350" y="290" text-anchor="middle" font-size="10" fill="#7f8c8d">Modules are aggregated using a CORRELATION MATRIX (not simple addition)</text>
+  <text x="350" y="306" text-anchor="middle" font-size="10" fill="#8e44ad" font-weight="bold">Total SCR < Sum of parts (diversification benefit)</text>
+</svg>
+
+<h3>Premium Risk vs Reserve Risk — Where YOU Fit</h3>
+
+<div class="grid2">
+  <div class="gcard" style="border-color:#e74c3c;text-align:left;padding:22px;">
+    <h4 style="color:#e74c3c;">📋 Premium Risk</h4>
+    <p><strong>Question:</strong> "How bad could NEXT YEAR's claims be, relative to what we expect?"</p>
+    <p><strong>Source:</strong> Your pricing model's uncertainty. The premium you charge is based on E[Loss], but actual losses could be much higher.</p>
+    <p><strong>Your input:</strong> Loss ratio volatility, frequency/severity distributions, cat exposure.</p>
+    <p><strong>Standard formula:</strong> SCR_premium = Volume × σ × z(99.5%)</p>
+  </div>
+  <div class="gcard" style="border-color:#e74c3c;text-align:left;padding:22px;">
+    <h4 style="color:#e74c3c;">📋 Reserve Risk</h4>
+    <p><strong>Question:</strong> "How bad could our existing reserves be wrong?"</p>
+    <p><strong>Source:</strong> Reserving uncertainty. We estimated IBNR = $50M but what if it's really $80M?</p>
+    <p><strong>Your input:</strong> Reserve variability from triangle analysis, development factor uncertainty.</p>
+    <p><strong>Standard formula:</strong> SCR_reserve = Outstanding reserves × σ × z(99.5%)</p>
+  </div>
+</div>
+
+<h3>Standard Formula: Premium & Reserve Risk Calculation</h3>
+
+<div class="box form">
+<strong>Combined Premium & Reserve Risk SCR:</strong><br><br>
+SCR_NL = 3 × σ × V<br><br>
+Where:<br>
+• <strong>V</strong> = Volume measure = max(earned premium, written premium) + outstanding reserves<br>
+• <strong>σ</strong> = Combined standard deviation (formula below)<br>
+• <strong>3</strong> = approximation for z(99.5%) assuming lognormal ≈ 3 standard deviations<br><br>
+
+<strong>σ combined:</strong><br>
+σ² = [σ_prem² × V_prem² + σ_res² × V_res² + 2 × ρ × σ_prem × V_prem × σ_res × V_res] / V²<br><br>
+
+<strong>ρ</strong> = correlation between premium and reserve risk (standard formula: 0.5)
+</div>
+
+<pre data-lang="python"><code># ══════════════════════════════════════════════════════════════
+# SOLVENCY II STANDARD FORMULA — Premium & Reserve Risk
+# ══════════════════════════════════════════════════════════════
+
+def standard_formula_nl_risk(
+    earned_premium,      # Volume of premium risk
+    outstanding_reserves, # Volume of reserve risk  
+    sigma_premium,       # Volatility of premium risk (from table or company data)
+    sigma_reserve,       # Volatility of reserve risk
+    rho=0.5             # Correlation between premium and reserve risk
+):
+    """
+    Solvency II Standard Formula: Non-Life Underwriting Risk (simplified).
+    
+    sigma_premium and sigma_reserve come from:
+    - Standard formula: prescribed by regulator per line of business
+    - USP (Undertaking-Specific Parameters): computed from YOUR data
+    - Internal model: full simulation
+    """
+    
+    V_prem = earned_premium
+    V_res = outstanding_reserves
+    V_total = V_prem + V_res
+    
+    # Combined sigma (variance formula with correlation)
+    variance = (
+        (sigma_premium * V_prem)**2 + 
+        (sigma_reserve * V_res)**2 + 
+        2 * rho * sigma_premium * V_prem * sigma_reserve * V_res
+    )
+    sigma_combined = np.sqrt(variance) / V_total
+    
+    # SCR = 3 * sigma * V (the "3" approximates 99.5th percentile of lognormal)
+    SCR = 3 * sigma_combined * V_total
+    
+    print(f"{'='*55}")
+    print(f"STANDARD FORMULA — Non-Life Underwriting Risk")
+    print(f"{'='*55}")
+    print(f"  Earned Premium:        ${earned_premium:>12,.0f}")
+    print(f"  Outstanding Reserves:  ${outstanding_reserves:>12,.0f}")
+    print(f"  Total Volume:          ${V_total:>12,.0f}")
+    print(f"  σ (premium):           {sigma_premium:.1%}")
+    print(f"  σ (reserve):           {sigma_reserve:.1%}")
+    print(f"  ρ (correlation):       {rho:.2f}")
+    print(f"  σ (combined):          {sigma_combined:.3%}")
+    print(f"{'─'*55}")
+    print(f"  SCR (Non-Life):        ${SCR:>12,.0f}")
+    print(f"{'='*55}")
+    
+    return SCR
+
+# ─── Example: General Liability (Construction) ──────────
+# Standard formula prescribed sigmas for GL:
+#   Premium risk σ: ~10% (varies by country/regulator)
+#   Reserve risk σ: ~11%
+
+scr = standard_formula_nl_risk(
+    earned_premium=80_000_000,       # $80M earned premium
+    outstanding_reserves=120_000_000, # $120M reserves
+    sigma_premium=0.10,              # 10% volatility
+    sigma_reserve=0.11,              # 11% volatility
+    rho=0.5                          # Prescribed correlation
+)
+</code></pre>
+
+<div class="box real">
+<strong>QBE context:</strong> As a GL pricing analyst, your frequency/severity models directly feed the Premium Risk calculation. If you can quantify the uncertainty in your pricing estimates (e.g., "my model predicts $60M loss ratio ± 15%"), that ±15% IS the sigma that drives capital. Better pricing models → more accurate capital → company doesn't hold too much (expensive) or too little (risky).
+</div>
+</div>
+
+<!-- ═══════════════════ SECTION 4 ═══════════════════ -->
+<div class="ch" id="sec4">
+<h2>Section 4: Building an Internal Model — Monte Carlo Simulation</h2>
+
+<div class="box frm">
+<strong>FRM Connection:</strong> You studied Monte Carlo simulation for pricing derivatives. In insurance, same technique, different application — you simulate CLAIMS instead of stock paths. The ingredients are simpler: no stochastic differential equations, just Poisson draws and lognormal draws.
+</div>
+
+<h3>The Full Simulation Pipeline</h3>
+
+<div class="flow">
+  <div class="fstep" style="background:#eaf2f8;">
+    <strong>1. Parameterize</strong><br>Freq & Sev<br>from pricing
+  </div>
+  <div class="farr">→</div>
+  <div class="fstep" style="background:#d5f5e3;">
+    <strong>2. Add Parameter<br>Uncertainty</strong><br>Parameters are random too
+  </div>
+  <div class="farr">→</div>
+  <div class="fstep" style="background:#fef9e7;">
+    <strong>3. Simulate</strong><br>100K scenarios
+  </div>
+  <div class="farr">→</div>
+  <div class="fstep" style="background:#e8daef;">
+    <strong>4. Aggregate</strong><br>Sum across lines<br>with dependencies
+  </div>
+  <div class="farr">→</div>
+  <div class="fstep" style="background:#fadbd8;border:2px solid var(--r);">
+    <strong>5. VaR</strong><br>99.5th percentile<br>= SCR
+  </div>
+</div>
+
+<h3>Step-by-Step: Multi-Line Internal Model</h3>
+
+<pre data-lang="python"><code># ══════════════════════════════════════════════════════════════
+# INTERNAL CAPITAL MODEL — Full Multi-Line Simulation
+# ══════════════════════════════════════════════════════════════
+import numpy as np
+from scipy import stats
+from scipy.stats import lognorm, poisson, norm
+
+np.random.seed(42)
+N_SIM = 100_000
+
+# ═══════════════════════════════════════════════════════════════
+# STEP 1: Define each Line of Business (from your pricing models)
+# ═══════════════════════════════════════════════════════════════
+
+lines_of_business = {
+    'GL_Construction': {
+        'expected_frequency': 200,        # Expected claims per year
+        'freq_distribution': 'poisson',   
+        'mean_severity': 95_000,          # Average claim size
+        'severity_cv': 2.8,               # High CV = heavy tail (construction!)
+        'severity_distribution': 'lognormal',
+        'earned_premium': 30_000_000,     # $30M premium
+    },
+    'Property': {
+        'expected_frequency': 500,
+        'freq_distribution': 'poisson',
+        'mean_severity': 45_000,
+        'severity_cv': 1.8,
+        'severity_distribution': 'lognormal',
+        'earned_premium': 50_000_000,
+    },
+    'Motor': {
+        'expected_frequency': 2000,
+        'freq_distribution': 'poisson',
+        'mean_severity': 12_000,
+        'severity_cv': 1.5,
+        'severity_distribution': 'lognormal',
+        'earned_premium': 40_000_000,
+    },
+}
+
+# ═══════════════════════════════════════════════════════════════
+# STEP 2: Simulate each line independently first
+# ═══════════════════════════════════════════════════════════════
+
+def simulate_aggregate_loss(params, n_sim):
+    """Simulate aggregate loss for one line of business."""
+    lam = params['expected_frequency']
+    mu_x = params['mean_severity']
+    cv = params['severity_cv']
+    
+    # Lognormal parameters from mean and CV
+    sigma = np.sqrt(np.log(1 + cv**2))
+    mu = np.log(mu_x) - 0.5 * sigma**2
+    
+    losses = np.zeros(n_sim)
+    for i in range(n_sim):
+        n_claims = np.random.poisson(lam)
+        if n_claims > 0:
+            claims = np.random.lognormal(mu, sigma, size=n_claims)
+            losses[i] = claims.sum()
+    
+    return losses
+
+# Simulate each line
+simulated_losses = {}
+for line, params in lines_of_business.items():
+    simulated_losses[line] = simulate_aggregate_loss(params, N_SIM)
+    print(f"{line}: Mean=${simulated_losses[line].mean()/1e6:.1f}M, "
+          f"VaR99.5=${np.percentile(simulated_losses[line], 99.5)/1e6:.1f}M")
+
+# ═══════════════════════════════════════════════════════════════
+# STEP 3: Introduce DEPENDENCIES using Copulas
+# ═══════════════════════════════════════════════════════════════
+# Lines of business are NOT independent!
+# Bad economy → more GL claims AND more property claims
+
+# Correlation matrix between lines
+correlation_matrix = np.array([
+    # GL    Prop   Motor
+    [1.00,  0.30,  0.15],  # GL
+    [0.30,  1.00,  0.10],  # Property
+    [0.15,  0.10,  1.00],  # Motor
+])
+
+# Generate correlated uniform random variables using Gaussian Copula
+# (This is the FRM copula concept in action!)
+from scipy.stats import norm as norm_dist
+
+def gaussian_copula_samples(corr_matrix, n_sim):
+    """Generate correlated uniform samples via Gaussian copula."""
+    n_vars = corr_matrix.shape[0]
+    
+    # Step 1: Cholesky decomposition of correlation matrix
+    L = np.linalg.cholesky(corr_matrix)
+    
+    # Step 2: Generate independent standard normals
+    Z = np.random.standard_normal((n_sim, n_vars))
+    
+    # Step 3: Correlate them
+    correlated_normals = Z @ L.T
+    
+    # Step 4: Transform to uniform [0,1] using normal CDF
+    uniforms = norm_dist.cdf(correlated_normals)
+    
+    return uniforms
+
+# Generate correlated samples
+U = gaussian_copula_samples(correlation_matrix, N_SIM)
+
+# Now use these correlated uniforms to "re-order" our simulated losses
+# This preserves marginal distributions but introduces dependency
+def apply_copula_dependency(simulated_losses_dict, uniforms):
+    """
+    Re-order simulated losses to match copula-implied dependency.
+    Uses the rank-correlation approach.
+    """
+    lines = list(simulated_losses_dict.keys())
+    dependent_losses = {}
+    
+    for i, line in enumerate(lines):
+        # Sort the simulated losses
+        sorted_losses = np.sort(simulated_losses_dict[line])
+        # Use copula uniforms to pick quantiles
+        # Convert uniform to index
+        indices = (uniforms[:, i] * (N_SIM - 1)).astype(int)
+        dependent_losses[line] = sorted_losses[indices]
+    
+    return dependent_losses
+
+dependent_losses = apply_copula_dependency(simulated_losses, U)
+
+# ═══════════════════════════════════════════════════════════════
+# STEP 4: Aggregate across all lines
+# ═══════════════════════════════════════════════════════════════
+
+total_loss = sum(dependent_losses.values())
+
+# ═══════════════════════════════════════════════════════════════
+# STEP 5: Compute Capital Metrics
+# ═══════════════════════════════════════════════════════════════
+
+total_premium = sum(p['earned_premium'] for p in lines_of_business.values())
+expected_loss = total_loss.mean()
+var_995 = np.percentile(total_loss, 99.5)
+var_99 = np.percentile(total_loss, 99.0)
+es_995 = total_loss[total_loss >= var_995].mean()
+
+# SCR = VaR - Expected (capital above what we've priced for)
+scr = var_995 - expected_loss
+
+# Diversification benefit
+sum_individual_scrs = sum(
+    np.percentile(dependent_losses[line], 99.5) - dependent_losses[line].mean()
+    for line in dependent_losses
+)
+diversification_benefit = sum_individual_scrs - scr
+
+print(f"\n{'='*60}")
+print(f"INTERNAL MODEL RESULTS")
+print(f"{'='*60}")
+print(f"  Total Premium:          ${total_premium/1e6:>8.1f}M")
+print(f"  Expected Total Loss:    ${expected_loss/1e6:>8.1f}M")
+print(f"  Loss Ratio (expected):  {expected_loss/total_premium:.1%}")
+print(f"{'─'*60}")
+print(f"  VaR (99.0%):            ${var_99/1e6:>8.1f}M")
+print(f"  VaR (99.5%):            ${var_995/1e6:>8.1f}M  ← 1-in-200 loss")
+print(f"  Expected Shortfall:     ${es_995/1e6:>8.1f}M")
+print(f"{'─'*60}")
+print(f"  SCR (VaR - Mean):       ${scr/1e6:>8.1f}M  ← CAPITAL REQUIRED")
+print(f"  Sum of individual SCRs: ${sum_individual_scrs/1e6:>8.1f}M")
+print(f"  Diversification Benefit:${diversification_benefit/1e6:>8.1f}M ({diversification_benefit/sum_individual_scrs:.0%} reduction)")
+print(f"{'='*60}")
+</code></pre>
+
+<div class="box key">
+<strong>Diversification Benefit:</strong> Because GL, Property, and Motor aren't perfectly correlated (ρ < 1), the combined SCR is LESS than the sum of individual SCRs. This is the same concept as portfolio diversification in FRM — imperfect correlations reduce total risk. The diversification benefit is often 20-35% in practice.
+</div>
+</div>
+
+<!-- ═══════════════════ SECTION 5 ═══════════════════ -->
+<div class="ch" id="sec5">
+<h2>Section 5: Parameter Uncertainty — Making It Realistic</h2>
+
+<div class="box think">
+In the simulation above, we used FIXED parameters (λ=200, μ_severity=95000). But in reality, we ESTIMATED those parameters from data — they have uncertainty! A proper capital model accounts for this: "not only is the loss random given our parameters, but the parameters themselves are uncertain."
+</div>
+
+<div class="box frm">
+<strong>FRM Connection:</strong> This is the "model risk" concept from FRM. Your VaR estimate has estimation error. In insurance, we handle this by putting distributions on the parameters themselves (Bayesian approach) or by bootstrapping.
+</div>
+
+<pre data-lang="python"><code># ══════════════════════════════════════════════════════════════
+# PARAMETER UNCERTAINTY — Two-Stage Simulation
+# ══════════════════════════════════════════════════════════════
+
+def simulate_with_parameter_uncertainty(
+    expected_freq,    # Central estimate of frequency
+    freq_cv,         # Uncertainty in frequency estimate (e.g., 15%)
+    mean_sev,        # Central estimate of severity  
+    sev_cv,          # CV of individual claim severity
+    sev_param_cv,    # Uncertainty in the severity PARAMETER (e.g., 10%)
+    n_sim=100_000
+):
+    """
+    Two-stage simulation:
+    Stage 1: Draw parameters from their uncertainty distributions
+    Stage 2: Given those parameters, simulate claims
+    
+    This captures BOTH process risk (randomness of claims) 
+    AND parameter risk (uncertainty in our estimates).
+    """
+    losses = np.zeros(n_sim)
+    
+    for i in range(n_sim):
+        # ─── Stage 1: Parameter Uncertainty ─────────────
+        # True frequency could be higher or lower than our estimate
+        # Model freq parameter as Gamma (positive, skewed)
+        freq_shape = 1 / freq_cv**2
+        freq_scale = expected_freq * freq_cv**2
+        true_freq = np.random.gamma(freq_shape, freq_scale)
+        
+        # True mean severity has uncertainty too
+        sev_shape = 1 / sev_param_cv**2
+        sev_scale = mean_sev * sev_param_cv**2
+        true_mean_sev = np.random.gamma(sev_shape, sev_scale)
+        
+        # ─── Stage 2: Process Risk (given true parameters) ─
+        n_claims = np.random.poisson(true_freq)
+        
+        if n_claims > 0:
+            sigma = np.sqrt(np.log(1 + sev_cv**2))
+            mu = np.log(true_mean_sev) - 0.5 * sigma**2
+            claims = np.random.lognormal(mu, sigma, size=n_claims)
+            losses[i] = claims.sum()
+    
+    return losses
+
+# ─── Compare: With and Without Parameter Uncertainty ─────
+losses_no_param_unc = simulate_aggregate_loss(
+    lines_of_business['GL_Construction'], N_SIM
+)
+
+losses_with_param_unc = simulate_with_parameter_uncertainty(
+    expected_freq=200,
+    freq_cv=0.15,        # 15% uncertainty in freq estimate
+    mean_sev=95_000,
+    sev_cv=2.8,
+    sev_param_cv=0.12,   # 12% uncertainty in sev estimate
+    n_sim=N_SIM
+)
+
+print("WITHOUT parameter uncertainty:")
+print(f"  VaR(99.5%) = ${np.percentile(losses_no_param_unc, 99.5)/1e6:.1f}M")
+print(f"\nWITH parameter uncertainty:")
+print(f"  VaR(99.5%) = ${np.percentile(losses_with_param_unc, 99.5)/1e6:.1f}M")
+print(f"\n  → Parameter uncertainty adds ~{((np.percentile(losses_with_param_unc,99.5)/np.percentile(losses_no_param_unc,99.5))-1)*100:.0f}% to the capital requirement")
+</code></pre>
+
+<div class="box warn">
+<strong>Key insight for the interview:</strong> Parameter uncertainty typically adds 10-30% to the capital requirement. This is why having BETTER data and BETTER models (like your GLM/GAM) directly reduces capital. Better pricing accuracy → lower parameter uncertainty → lower SCR → company can write more business with the same capital.
+</div>
+</div>
+
+<!-- ═══════════════════ SECTION 6 ═══════════════════ -->
+<div class="ch" id="sec6">
+<h2>Section 6: Copulas & Dependency — The FRM Deep Dive</h2>
+
+<div class="box frm">
+<strong>FRM Part 1 covered:</strong> Gaussian copula, t-copula, tail dependence, Spearman's rho vs Kendall's tau. All of this applies directly to capital modelling. The 2008 financial crisis showed that Gaussian copulas underestimate tail dependence — the same lesson applies to insurance.
+</div>
+
+<h3>Why Dependency Matters for Capital</h3>
+
+<div class="box eli5">
+If GL and Property are independent: the chance BOTH have a bad year simultaneously = 0.5% × 0.5% = 0.0025% (basically impossible).<br><br>
+If they're correlated (e.g., economic recession causes more claims in both): the chance both have a bad year is much higher. More co-movement in the tail = MORE capital needed.
+</div>
+
+<h3>Copula Choices and Their Properties</h3>
+
+<table>
+  <tr><th>Copula</th><th>Tail Dependence</th><th>When to Use</th><th>Insurance Example</th></tr>
+  <tr><td><strong>Gaussian</strong></td><td>None (tails are independent)</td><td>Default/baseline</td><td>Lines with little tail connection</td></tr>
+  <tr><td><strong>Student-t</strong></td><td>Symmetric tail dependence</td><td>When extremes co-occur</td><td>Economic recession hits all lines</td></tr>
+  <tr><td><strong>Clayton</strong></td><td>Lower tail only</td><td>When bad events are correlated but good events aren't</td><td>Catastrophes affecting multiple lines</td></tr>
+  <tr><td><strong>Gumbel</strong></td><td>Upper tail only</td><td>When extreme losses co-occur</td><td>Rarely used in insurance SCR</td></tr>
+  <tr><td><strong>Frank</strong></td><td>None (symmetric)</td><td>Moderate dependence, no tail</td><td>Similar to Gaussian but different shape</td></tr>
+</table>
+
+<pre data-lang="python"><code># ══════════════════════════════════════════════════════════════
+# COPULA COMPARISON — Gaussian vs t-Copula
+# ══════════════════════════════════════════════════════════════
+from scipy.stats import t as t_dist
+
+def t_copula_samples(corr_matrix, df, n_sim):
+    """
+    Generate samples from a t-copula.
+    Key difference from Gaussian: HEAVIER TAILS → more tail dependence.
+    
+    df = degrees of freedom:
+      - df → ∞: converges to Gaussian copula
+      - df = 3-5: significant tail dependence
+    """
+    n_vars = corr_matrix.shape[0]
+    L = np.linalg.cholesky(corr_matrix)
+    
+    # Generate from multivariate t-distribution
+    Z = np.random.standard_normal((n_sim, n_vars))
+    correlated_normals = Z @ L.T
+    
+    # Mix with chi-squared to get t-distribution
+    chi2 = np.random.chisquare(df, size=n_sim)
+    scaling = np.sqrt(df / chi2)
+    correlated_t = correlated_normals * scaling[:, np.newaxis]
+    
+    # Transform to uniform using t-CDF
+    uniforms = t_dist.cdf(correlated_t, df)
+    
+    return uniforms
+
+# Compare Gaussian vs t-copula for SCR
+# Gaussian: no tail dependence
+U_gaussian = gaussian_copula_samples(correlation_matrix, N_SIM)
+dep_losses_gaussian = apply_copula_dependency(simulated_losses, U_gaussian)
+total_gaussian = sum(dep_losses_gaussian.values())
+
+# t-copula (df=4): significant tail dependence  
+U_t = t_copula_samples(correlation_matrix, df=4, n_sim=N_SIM)
+dep_losses_t = apply_copula_dependency(simulated_losses, U_t)
+total_t = sum(dep_losses_t.values())
+
+print(f"Gaussian Copula VaR(99.5%): ${np.percentile(total_gaussian, 99.5)/1e6:.1f}M")
+print(f"t-Copula (df=4) VaR(99.5%): ${np.percentile(total_t, 99.5)/1e6:.1f}M")
+print(f"  → t-copula gives {((np.percentile(total_t,99.5)/np.percentile(total_gaussian,99.5))-1)*100:.1f}% higher capital")
+print(f"  → Because extreme losses across lines are MORE likely to co-occur")
+</code></pre>
+
+<div class="box key">
+<strong>Interview gold:</strong> "The choice of copula significantly impacts the SCR. A Gaussian copula assumes no tail dependence — extreme events in different lines are independent. A t-copula introduces tail dependence: when one line has a catastrophic year, others are more likely to as well. In practice, the t-copula often adds 5-15% to the diversified SCR compared to Gaussian, and is more realistic for insurance portfolios where systemic events (economic downturns, pandemics) affect multiple lines simultaneously."
+</div>
+</div>
+
+<!-- ═══════════════════ SECTION 7 ═══════════════════ -->
+<div class="ch" id="sec7">
+<h2>Section 7: Reserve Risk in the Capital Model</h2>
+
+<div class="box eli5">
+Remember your loss triangle work? Reserving gives you IBNR estimates. But those estimates are uncertain — the triangle could develop differently than expected. <strong>Reserve risk</strong> captures: "How wrong could our reserves be?"
+</div>
+
+<h3>Connecting Your Triangle Work to Capital</h3>
+
+<pre data-lang="python"><code># ══════════════════════════════════════════════════════════════
+# RESERVE RISK: Bootstrap the Triangle
+# ══════════════════════════════════════════════════════════════
+# The Mack method gives a closed-form estimate of reserve variability
+# The Bootstrap method gives a full distribution via simulation
+
+def bootstrap_chain_ladder(cum_triangle, n_bootstrap=10_000):
+    """
+    Bootstrap the Chain Ladder to get a DISTRIBUTION of ultimate losses.
+    This distribution's tail gives you the reserve risk capital.
+    
+    Method: Resample the age-to-age factors with replacement,
+    re-project the triangle, get a different ultimate each time.
+    """
+    dev_years = sorted(cum_triangle.columns)
+    n_dy = len(dev_years)
+    
+    # Compute individual ATA factors for each AY
+    all_factors = {}  # {dy_period: [list of individual AY factors]}
+    for i in range(n_dy - 1):
+        col_now = dev_years[i]
+        col_next = dev_years[i + 1]
+        mask = cum_triangle[col_now].notna() & cum_triangle[col_next].notna()
+        factors = (cum_triangle.loc[mask, col_next] / cum_triangle.loc[mask, col_now]).values
+        all_factors[i] = factors
+    
+    # Bootstrap: resample factors and re-project
+    bootstrap_ultimates = np.zeros(n_bootstrap)
+    
+    for b in range(n_bootstrap):
+        # Resample: for each development period, randomly pick factors
+        resampled_cdfs = {}
+        for dy_idx in range(n_dy):
+            if dy_idx < n_dy - 1:
+                # Pick a random factor from the available ones
+                sampled_factor = np.random.choice(all_factors[dy_idx])
+                resampled_cdfs[dev_years[dy_idx]] = sampled_factor
+            else:
+                resampled_cdfs[dev_years[dy_idx]] = 1.0
+        
+        # Compute CDF to ultimate for each starting DY
+        total_ultimate = 0
+        for ay in cum_triangle.index:
+            row = cum_triangle.loc[ay].dropna()
+            latest_dy_idx = list(cum_triangle.columns).index(row.index[-1])
+            latest_value = row.iloc[-1]
+            
+            # Multiply remaining factors
+            cdf = 1.0
+            for k in range(latest_dy_idx, n_dy - 1):
+                cdf *= resampled_cdfs[dev_years[k]]
+            
+            total_ultimate += latest_value * cdf
+        
+        bootstrap_ultimates[b] = total_ultimate
+    
+    return bootstrap_ultimates
+
+# Run bootstrap
+# boot_ultimates = bootstrap_chain_ladder(cum_triangle, n_bootstrap=10_000)
+# 
+# reserve_mean = boot_ultimates.mean()
+# reserve_995 = np.percentile(boot_ultimates, 99.5)
+# reserve_risk_scr = reserve_995 - reserve_mean
+# 
+# print(f"Expected Ultimate (mean):  ${reserve_mean/1e6:.1f}M")
+# print(f"99.5th percentile:         ${reserve_995/1e6:.1f}M")  
+# print(f"Reserve Risk Capital:      ${reserve_risk_scr/1e6:.1f}M")
+# print(f"Reserve CoV:               {boot_ultimates.std()/reserve_mean:.1%}")
+</code></pre>
+
+<div class="box key">
+<strong>The Chain:</strong> Your pricing model → feeds expected loss → feeds reserving estimates → feeds reserve risk capital. If your pricing model is wrong, the reserves are wrong, and the capital is wrong. Everything is connected. That's why improving pricing accuracy has capital implications.
+</div>
+</div>
+
+<!-- ═══════════════════ SECTION 8 ═══════════════════ -->
+<div class="ch" id="sec8">
+<h2>Section 8: Catastrophe Risk & Extreme Value Theory</h2>
+
+<div class="box frm">
+<strong>FRM Connection:</strong> You studied EVT — GPD (Generalized Pareto Distribution) for modelling extreme tails, threshold selection, Hill estimator. In insurance, EVT models the very largest claims (mega-catastrophes) that drive the 99.5th percentile.
+</div>
+
+<h3>Why Normal Distributions Fail for Insurance Capital</h3>
+
+<div class="box warn">
+<strong>The problem:</strong> Insurance losses are HEAVY-TAILED. A single catastrophe can cost more than 10 years of normal losses combined. If you assume Normal distribution, you'll massively UNDERESTIMATE the 99.5th percentile.<br><br>
+Actual insurance loss distributions have:<br>
+• <strong>Right skewness:</strong> Many small claims, few huge ones<br>
+• <strong>Excess kurtosis:</strong> More extreme events than Normal predicts<br>
+• <strong>Fat tails:</strong> Probability of 5× expected is much higher than Normal implies
+</div>
+
+<pre data-lang="python"><code># ══════════════════════════════════════════════════════════════
+# EVT + INSURANCE: Modelling Large Claims Separately
+# ══════════════════════════════════════════════════════════════
+from scipy.stats import genpareto
+
+# ─── Approach: Separate "attritional" from "large" claims ───
+# Attritional: Normal claims < threshold (e.g., < $500K)
+# Large: Claims > threshold → model with GPD (from FRM EVT!)
+
+def simulate_with_large_claims(
+    attritional_freq, attritional_mean_sev, attritional_cv,
+    large_freq,      # Expected number of large claims per year
+    threshold,       # GPD threshold (e.g., $500K)
+    gpd_shape,       # ξ (xi) parameter: >0 means heavy tail (Pareto-like)
+    gpd_scale,       # σ parameter
+    n_sim=100_000
+):
+    """
+    Split model: attritional claims + large claims (EVT/GPD).
+    This is how sophisticated internal models work.
+    """
+    losses = np.zeros(n_sim)
+    
+    for i in range(n_sim):
+        # Attritional claims (many small claims)
+        n_att = np.random.poisson(attritional_freq)
+        sigma = np.sqrt(np.log(1 + attritional_cv**2))
+        mu = np.log(attritional_mean_sev) - 0.5 * sigma**2
+        if n_att > 0:
+            att_claims = np.random.lognormal(mu, sigma, size=n_att)
+            att_claims = att_claims[att_claims < threshold]  # Cap at threshold
+            att_total = att_claims.sum()
+        else:
+            att_total = 0
+        
+        # Large claims (few but huge) — modelled with GPD
+        n_large = np.random.poisson(large_freq)
+        if n_large > 0:
+            # GPD excess above threshold
+            excesses = genpareto.rvs(gpd_shape, scale=gpd_scale, size=n_large)
+            large_claims = threshold + excesses
+            large_total = large_claims.sum()
+        else:
+            large_total = 0
+        
+        losses[i] = att_total + large_total
+    
+    return losses
+
+# Example: GL Construction with large claims
+losses_split = simulate_with_large_claims(
+    attritional_freq=180,
+    attritional_mean_sev=60_000,
+    attritional_cv=1.5,
+    large_freq=5,              # ~5 large claims per year
+    threshold=500_000,         # Large = > $500K
+    gpd_shape=0.7,             # ξ=0.7 → heavy Pareto tail (infinite variance!)
+    gpd_scale=300_000,
+    n_sim=N_SIM
+)
+
+print(f"Mean: ${losses_split.mean()/1e6:.1f}M")
+print(f"VaR(99.5%): ${np.percentile(losses_split, 99.5)/1e6:.1f}M")
+print(f"VaR/Mean ratio: {np.percentile(losses_split, 99.5)/losses_split.mean():.1f}x")
+print(f"  → The 1-in-200 year is {np.percentile(losses_split,99.5)/losses_split.mean():.1f}x the expected!")
+print(f"  → This is much higher than a Normal would predict")
+</code></pre>
+
+<div class="box key">
+<strong>GPD shape parameter ξ (xi) interpretation:</strong><br>
+• ξ = 0: Exponential tail (light) — rare for insurance<br>
+• ξ = 0.3-0.5: Moderate heavy tail — typical for GL claims<br>
+• ξ = 0.7-1.0: Very heavy tail — construction defects, asbestos<br>
+• ξ > 1: Infinite mean! (extreme — catastrophe losses can approach this)<br><br>
+For GL Construction at QBE, ξ is probably 0.4-0.8. This means the ratio of VaR(99.5%)/Mean is likely 3x-6x, not the 1.5x that Normal would predict.
+</div>
+</div>
+
+<!-- ═══════════════════ SECTION 9 ═══════════════════ -->
+<div class="ch" id="sec9">
+<h2>Section 9: Capital Allocation — How Capital Gets Assigned to Lines</h2>
+
+<div class="box eli5">
+Total company SCR = $200M. But there are 5 lines of business. How much capital does each line "use"? This matters because:<br>
+• Lines that use more capital should earn higher returns (to justify the capital)<br>
+• Capital allocation directly impacts <strong>pricing</strong> — the capital cost is loaded into the premium<br>
+• Performance is measured as Return on Allocated Capital (ROAC)
+</div>
+
+<h3>Capital Allocation Methods</h3>
+
+<table>
+  <tr><th>Method</th><th>Logic</th><th>Formula</th></tr>
+  <tr><td><strong>Proportional to standalone SCR</strong></td><td>Simple. Each line gets capital in proportion to its standalone risk.</td><td>Alloc_i = SCR_i / Σ(SCR_j) × Total SCR</td></tr>
+  <tr><td><strong>Euler / Marginal</strong></td><td>Each line gets capital equal to its MARGINAL contribution to total risk. Mathematically elegant, adds up to total.</td><td>Alloc_i = E[L_i | L_total = VaR(99.5%)]</td></tr>
+  <tr><td><strong>Shapley Value</strong></td><td>Game theory approach. Average marginal contribution across all possible orderings.</td><td>Complex — rarely used in practice</td></tr>
+</table>
+
+<pre data-lang="python"><code># ══════════════════════════════════════════════════════════════
+# CAPITAL ALLOCATION — Euler Method (Industry Standard)
+# ══════════════════════════════════════════════════════════════
+
+def euler_allocation(dependent_losses_dict, total_losses, confidence=99.5):
+    """
+    Euler (marginal) capital allocation.
+    
+    For each line, allocate capital = E[L_i | Total ≈ VaR(99.5%)]
+    i.e., "When total losses are at the 99.5th percentile, 
+           what was this line's contribution on average?"
+    
+    This is THE most theoretically sound allocation method.
+    """
+    var_level = np.percentile(total_losses, confidence)
+    
+    # Find simulations where total loss is "near" VaR
+    # Use a band: 99.0% to 99.9%
+    lower = np.percentile(total_losses, confidence - 0.5)
+    upper = np.percentile(total_losses, confidence + 0.4)
+    mask = (total_losses >= lower) & (total_losses <= upper)
+    
+    allocations = {}
+    for line, losses in dependent_losses_dict.items():
+        # Average contribution of this line when total is near VaR
+        allocations[line] = losses[mask].mean()
+    
+    # Normalize to sum to total SCR
+    total_alloc = sum(allocations.values())
+    scr_total = var_level - total_losses.mean()
+    
+    print(f"\n{'='*60}")
+    print(f"EULER CAPITAL ALLOCATION")
+    print(f"{'='*60}")
+    print(f"  Total SCR: ${scr_total/1e6:.1f}M")
+    print(f"{'─'*60}")
+    
+    for line in allocations:
+        alloc_scr = (allocations[line] / total_alloc) * scr_total
+        standalone_scr = np.percentile(dependent_losses_dict[line], 99.5) - dependent_losses_dict[line].mean()
+        div_benefit = standalone_scr - alloc_scr
+        print(f"  {line:20s}: Allocated=${alloc_scr/1e6:.1f}M "
+              f"(Standalone=${standalone_scr/1e6:.1f}M, "
+              f"Div Benefit=${div_benefit/1e6:.1f}M)")
+    
+    print(f"{'='*60}")
+    return allocations
+
+# alloc = euler_allocation(dependent_losses, total_loss)
+</code></pre>
+
+<div class="box key">
+<strong>Pricing + Capital connection:</strong><br>
+If GL Construction is allocated $25M of capital, and the cost of capital is 10%, then $2.5M must be loaded into GL premiums as a "capital charge." This means:<br><br>
+Premium = Expected Loss + Expenses + <span class="highlight">Capital Cost ($2.5M)</span> + Profit Margin<br><br>
+If your pricing model reduces capital requirement (by better modelling tail risk), it DIRECTLY reduces the premium needed, making the product more competitive.
+</div>
+</div>
+
+<!-- ═══════════════════ SECTION 10 ═══════════════════ -->
+<div class="ch" id="sec10">
+<h2>Section 10: Putting It All Together — Your Pitch & Interview Answers</h2>
+
+<h3>How to Pitch This Project</h3>
+
+<div class="box ok">
+<strong>Your pitch:</strong><br>
+"I want to build a simulation-based capital model that connects our pricing output directly to capital requirements. Specifically: (1) take the frequency and severity distributions from our GLMs/GAMs, (2) add parameter uncertainty using bootstrapping, (3) simulate aggregate losses using Monte Carlo with appropriate copula structures for inter-line dependencies, (4) compute the 99.5% VaR for the SCR, and (5) allocate capital back to lines using the Euler method so we can properly load capital costs into pricing. The result is a closed-loop: better pricing accuracy → lower parameter uncertainty → lower capital → more competitive premiums."
+</div>
+
+<h3>The Closed Loop Diagram</h3>
+
+<svg width="600" height="280" viewBox="0 0 600 280" style="margin:20px auto;display:block;">
+  <text x="300" y="18" text-anchor="middle" font-weight="bold" font-size="12" fill="#2c3e50">The Pricing-Capital Feedback Loop</text>
+  
+  <!-- Circular flow -->
+  <ellipse cx="300" cy="155" rx="220" ry="100" fill="none" stroke="#bdc3c7" stroke-width="1.5" stroke-dasharray="5"/>
+  
+  <!-- Nodes -->
+  <rect x="220" y="35" width="160" height="40" rx="10" fill="#2980b9"/>
+  <text x="300" y="60" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold">PRICING MODEL</text>
+  
+  <rect x="430" y="110" width="140" height="40" rx="10" fill="#27ae60"/>
+  <text x="500" y="135" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold">LOSS DISTRIBUTIONS</text>
+  
+  <rect x="400" y="200" width="170" height="40" rx="10" fill="#8e44ad"/>
+  <text x="485" y="225" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold">CAPITAL MODEL (SCR)</text>
+  
+  <rect x="130" y="200" width="170" height="40" rx="10" fill="#e74c3c"/>
+  <text x="215" y="225" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold">CAPITAL ALLOCATION</text>
+  
+  <rect x="30" y="110" width="160" height="40" rx="10" fill="#f39c12"/>
+  <text x="110" y="135" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold">CAPITAL COST → PRICE</text>
+  
+  <!-- Arrows (clockwise) -->
+  <path d="M380,60 Q450,70 450,110" fill="none" stroke="#2c3e50" stroke-width="2" marker-end="url(#arw)"/>
+  <path d="M520,150 Q520,180 500,200" fill="none" stroke="#2c3e50" stroke-width="2" marker-end="url(#arw)"/>
+  <path d="M400,220 L300,220" fill="none" stroke="#2c3e50" stroke-width="2" marker-end="url(#arw)"/>
+  <path d="M130,220 Q80,180 90,150" fill="none" stroke="#2c3e50" stroke-width="2" marker-end="url(#arw)"/>
+  <path d="M130,110 Q180,80 220,65" fill="none" stroke="#2c3e50" stroke-width="2" marker-end="url(#arw)"/>
+  
+  <defs><marker id="arw" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#2c3e50"/></marker></defs>
+  
+  <text x="300" y="270" text-anchor="middle" font-size="10" fill="#7f8c8d" font-style="italic">Better pricing → lower uncertainty → lower capital → more competitive price</text>
+</svg>
+
+<h3>Interview Q&A</h3>
+
+<div class="grid2" style="margin-top:20px;">
+  <div class="gcard" style="border-color:#2980b9;text-align:left;padding:22px;">
+    <h4 style="color:#2980b9;">Q: "What is the SCR?"</h4>
+    <p><strong>A:</strong> "The Solvency Capital Requirement is the amount of capital an insurer must hold to survive a 1-in-200 year adverse event. Technically, it's the 99.5% VaR of the change in basic own funds over a one-year time horizon. It ensures the company can meet its obligations to policyholders with 99.5% probability."</p>
+  </div>
+  <div class="gcard" style="border-color:#2980b9;text-align:left;padding:22px;">
+    <h4 style="color:#2980b9;">Q: "How does pricing connect to capital?"</h4>
+    <p><strong>A:</strong> "Pricing provides the expected loss (mean). Capital looks at how bad losses could be (tail). Both use the same underlying frequency-severity model — capital just extends it to the full distribution. Additionally, capital costs are loaded back into the premium, so there's a direct feedback loop: riskier business needs more capital, which costs more, which must be reflected in higher premiums."</p>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="gcard" style="border-color:#27ae60;text-align:left;padding:22px;">
+    <h4 style="color:#27ae60;">Q: "Explain diversification benefit."</h4>
+    <p><strong>A:</strong> "Because different lines of business aren't perfectly correlated, the combined capital requirement is less than the sum of individual capitals. For example, if GL needs $30M and Property needs $40M standalone, together they might only need $55M (not $70M) because it's unlikely both have their worst year simultaneously. The $15M difference is the diversification benefit. We model this using copulas to capture the dependency structure."</p>
+  </div>
+  <div class="gcard" style="border-color:#27ae60;text-align:left;padding:22px;">
+    <h4 style="color:#27ae60;">Q: "Why not just use the Normal distribution?"</h4>
+    <p><strong>A:</strong> "Insurance losses are heavily right-skewed and fat-tailed. A Normal distribution would massively underestimate the 99.5th percentile. We use lognormal or Pareto distributions for severity, and for the extreme tail, Generalized Pareto (from EVT). The ratio of VaR(99.5%)/Mean for insurance is typically 2-5x, while a Normal would suggest ~1.5x. Using Normal = holding too little capital."</p>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="gcard" style="border-color:#f39c12;text-align:left;padding:22px;">
+    <h4 style="color:#f39c12;">Q: "Standard formula vs internal model?"</h4>
+    <p><strong>A:</strong> "The standard formula uses prescribed factors and correlations — one size fits all. An internal model uses company-specific data, distributions, and copulas. Internal models are more accurate (often resulting in lower SCR through better-captured diversification) but require significant investment and regulatory approval. The standard formula is a floor — companies can use it immediately without approval."</p>
+  </div>
+  <div class="gcard" style="border-color:#f39c12;text-align:left;padding:22px;">
+    <h4 style="color:#f39c12;">Q: "What is parameter uncertainty?"</h4>
+    <p><strong>A:</strong> "Our model parameters (frequency λ, severity μ) are estimates from data — they have confidence intervals. Parameter uncertainty means: even if the world stays the same, our estimates could be wrong. A proper capital model simulates this: first draw the 'true' parameters from their uncertainty distribution, THEN simulate claims. This typically adds 10-30% to the capital requirement. Better data and better models reduce parameter uncertainty."</p>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="gcard" style="border-color:#8e44ad;text-align:left;padding:22px;">
+    <h4 style="color:#8e44ad;">Q: "What copula would you use?"</h4>
+    <p><strong>A:</strong> "I'd start with a Gaussian copula as a baseline — it's simple and widely used. Then I'd compare with a t-copula (df=4-8) which introduces tail dependence: the property that when one line has extreme losses, other lines are more likely to as well. For insurance, t-copula is more realistic because systemic events (economic downturns, regulatory changes) affect multiple lines. The t-copula typically adds 5-15% to the diversified SCR."</p>
+  </div>
+  <div class="gcard" style="border-color:#8e44ad;text-align:left;padding:22px;">
+    <h4 style="color:#8e44ad;">Q: "How many simulations do you need?"</h4>
+    <p><strong>A:</strong> "For VaR at 99.5%, you need the estimate to be stable at the 99.5th percentile. With 100,000 simulations, you have 500 observations above the 99.5th percentile — enough for a stable estimate. I'd validate by running the model multiple times with different seeds and checking that the SCR doesn't move by more than ±2-3%. For regulatory submissions, companies often run 250,000-1,000,000."</p>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="gcard" style="border-color:#c0392b;text-align:left;padding:22px;">
+    <h4 style="color:#c0392b;">Q: "VaR vs Expected Shortfall — which is better?"</h4>
+    <p><strong>A:</strong> "VaR tells you the THRESHOLD of a bad year (you won't lose more than $X with 99.5% probability). But it says nothing about HOW BAD it gets beyond that point. Expected Shortfall (CVaR) = average loss GIVEN you're beyond VaR. ES is sub-additive (diversification always helps), unlike VaR. Solvency II uses VaR(99.5%), but internal risk management often uses ES because it better captures tail severity. Swiss Solvency Test uses ES."</p>
+  </div>
+  <div class="gcard" style="border-color:#c0392b;text-align:left;padding:22px;">
+    <h4 style="color:#c0392b;">Q: "How does reinsurance affect the capital model?"</h4>
+    <p><strong>A:</strong> "Reinsurance truncates the loss distribution — an excess-of-loss treaty with $2M retention means no individual claim costs us more than $2M. This massively reduces the tail (VaR). In the capital model, we simulate losses GROSS, then apply reinsurance recoveries to get NET losses, and compute SCR on the net. The capital saving from reinsurance must be weighed against the reinsurance premium cost."</p>
+  </div>
+</div>
+
+<h3>Your Killer Statement</h3>
+
+<div class="box interview">
+<strong>When they ask "Why do you want to work on capital modelling?":</strong><br><br>
+"I see capital modelling as the natural extension of my pricing work. I already model frequency and severity distributions — capital modelling extends that to the full distribution tail. My FRM background gives me the theoretical foundation: VaR, Expected Shortfall, copulas, Monte Carlo simulation, and EVT. What excites me is the feedback loop — better pricing accuracy directly reduces parameter uncertainty, which reduces capital requirements, which makes our products more competitive. I want to close that loop analytically: build the pipeline from pricing model outputs through to SCR, so the team can quantify exactly how much a model improvement saves in capital."
+</div>
+
+<h3>Summary: Everything Connects</h3>
+
+<table>
+  <tr><th>Your Skill</th><th>Capital Model Application</th><th>Why It Matters</th></tr>
+  <tr><td>GLM/GAM frequency models</td><td>Poisson λ → Monte Carlo frequency draws</td><td>Drives the number of claims simulated</td></tr>
+  <tr><td>Severity modelling</td><td>Lognormal/Pareto → Monte Carlo severity draws</td><td>Drives claim size distribution</td></tr>
+  <tr><td>Loss ratios</td><td>Expected loss = BF prior in capital model</td><td>Anchors the mean of aggregate distribution</td></tr>
+  <tr><td>Loss triangles</td><td>Reserve variability → Reserve risk SCR</td><td>Quantifies how wrong reserves could be</td></tr>
+  <tr><td>FRM: VaR</td><td>99.5th percentile of simulated losses = SCR</td><td>THE regulatory capital measure</td></tr>
+  <tr><td>FRM: ES (CVaR)</td><td>Tail risk beyond VaR → reinsurance decisions</td><td>How bad beyond the threshold</td></tr>
+  <tr><td>FRM: Copulas</td><td>Dependency between lines → diversification benefit</td><td>Determines if combined capital < sum of parts</td></tr>
+  <tr><td>FRM: Monte Carlo</td><td>The simulation engine (100K+ scenarios)</td><td>Heart of any internal model</td></tr>
+  <tr><td>FRM: EVT/GPD</td><td>Large claim / catastrophe tail modelling</td><td>Gets the 99.5% right for heavy-tailed lines</td></tr>
+</table>
+
+</div>
+
+<!-- NAV FOOTER -->
+<div class="nav-footer">
+  <a href="index.html">← Course Home</a>
+  <span style="color:var(--lt);">Supplementary: Solvency II Capital Modelling</span>
+  <a href="Reserving_Loss_Triangles.html">Loss Triangles & Reserving →</a>
+</div>
+
+</div>
+<div style="text-align:center;padding:30px;color:var(--lt);font-size:.85em;">Insurance Pricing Modelling Complete Course | Solvency II Capital Modelling</div>
+</body>
+</html>
